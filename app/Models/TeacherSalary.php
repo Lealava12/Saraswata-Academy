@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class TeacherSalary extends Model
+{
+    protected $table = 'teacher_salaries';
+    protected $fillable = [
+        'teacher_id',
+        'amount',
+        'payment_month',
+        'payment_date',
+        'class_count',
+        'slug',
+        'is_active',
+    ];
+
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(fn($m) => $m->slug = $m->slug ?: \Str::slug('tsal-' . uniqid()));
+    }
+}
