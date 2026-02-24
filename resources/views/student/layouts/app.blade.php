@@ -61,7 +61,7 @@
                     </a>
                 </li>
             </ul>
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0 border-top pt-3 pt-lg-0 border-lg-0">
                 <span class="text-muted small">{{ Auth::guard('student')->user()?->name }}</span>
                 <a href="{{ route('student.logout') }}" class="btn btn-outline-danger btn-sm">
                     <i class="bi bi-box-arrow-right me-1"></i>Logout

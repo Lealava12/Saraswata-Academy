@@ -23,9 +23,7 @@
             <div class="card login-card p-4">
                 <div class="card-body">
                     <div class="text-center mb-4">
-                        <div class="login-logo">
-                            <i class="bi bi-person-graduation text-white fs-2"></i>
-                        </div>
+                       
                         <h4 class="fw-bold">Student Portal</h4>
                         <p class="text-muted small">Saraswata Academy</p>
                     </div>

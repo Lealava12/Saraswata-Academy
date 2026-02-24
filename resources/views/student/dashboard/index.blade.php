@@ -6,22 +6,22 @@
 
 <!-- Student Info Banner -->
 <div class="card mb-4" style="background:linear-gradient(135deg,#1e3a8a,#6366f1);color:#fff;">
-    <div class="card-body d-flex align-items-center gap-4 flex-wrap">
+    <div class="card-body d-flex align-items-center gap-3 gap-md-4 flex-wrap">
         <div>
             <div class="fs-4 fw-bold">{{ $student->student_id }}</div>
             <div class="opacity-75 small">Student ID</div>
         </div>
-        <div class="vr opacity-25"></div>
+        <div class="vr opacity-25 d-none d-md-block"></div>
         <div>
             <div class="fw-semibold">{{ $student->classInfo->name ?? '-' }}</div>
             <div class="opacity-75 small">Class</div>
         </div>
-        <div class="vr opacity-25"></div>
+        <div class="vr opacity-25 d-none d-md-block"></div>
         <div>
             <div class="fw-semibold">{{ $student->board->name ?? '-' }}</div>
             <div class="opacity-75 small">Board</div>
         </div>
-        <div class="vr opacity-25"></div>
+        <div class="vr opacity-25 d-none d-md-block"></div>
         <div>
             <div class="fw-semibold">Roll No. {{ $student->roll_no }}</div>
             <div class="opacity-75 small">Roll Number</div>
@@ -39,7 +39,7 @@
 
 <div class="row g-3">
     <!-- Today's Attendance -->
-    <div class="col-md-3">
+    <div class="col-sm-6 col-lg-3">
         <div class="card text-center h-100">
             <div class="card-body">
                 <i class="bi bi-calendar-check fs-1 {{ $todayAttendance ? ($todayAttendance->status === 'Present' ? 'text-success' : 'text-danger') : 'text-muted' }}"></i>
@@ -56,7 +56,7 @@
     </div>
 
     <!-- Next Fee Due -->
-    <div class="col-md-3">
+    <div class="col-sm-6 col-lg-3">
         <div class="card text-center h-100">
             <div class="card-body">
                 <i class="bi bi-cash-coin fs-1 {{ $nextFee ? 'text-warning' : 'text-success' }}"></i>
@@ -72,7 +72,7 @@
     </div>
 
     <!-- Last Exam -->
-    <div class="col-md-3">
+    <div class="col-sm-6 col-lg-3">
         <div class="card text-center h-100">
             <div class="card-body">
                 <i class="bi bi-journal-text fs-1 text-primary"></i>
@@ -88,7 +88,7 @@
     </div>
 
     <!-- Latest Material -->
-    <div class="col-md-3">
+    <div class="col-sm-6 col-lg-3">
         <div class="card text-center h-100">
             <div class="card-body">
                 <i class="bi bi-bag-fill fs-1 text-info"></i>
