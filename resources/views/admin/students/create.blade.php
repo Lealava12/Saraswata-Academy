@@ -26,8 +26,8 @@
                 </div> 
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Mobile <span class="text-danger">*</span></label>
-                    <input type="tel" maxlength="10" name="mobile" class="form-control @error('mobile') is-invalid @enderror" value="{{ old('mobile') }}" required>
-                </div> 
+                    <input type="number" id="mobile" name="mobile" class="form-control" value="{{ old('mobile') }}" required>
+                 </div> 
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Email</label>
                     <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}">
@@ -85,7 +85,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Father's Mobile</label>
-                    <input type="tel" maxlength="10" name="father_mobile" class="form-control" value="{{ old('father_mobile') }}">
+              <input type="number" id="father_mobile" name="father_mobile" class="form-control" value="{{ old('father_mobile') }}">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Mother's Name</label>
@@ -93,8 +93,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Mother's Mobile</label>
-                    <input type="tel" maxlength="10" name="mother_mobile" class="form-control" value="{{ old('mother_mobile') }}">
-                </div>
+                 <input type="number" id="mother_mobile" name="mother_mobile" class="form-control" value="{{ old('mother_mobile') }}">                </div>
                 <div class="col-md-8">
                     <label class="form-label fw-medium">Address</label>
                     <textarea name="address" class="form-control" rows="2">{{ old('address') }}</textarea>
@@ -109,4 +108,21 @@
             </form>
         </div>
     </div>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    function limitMobileInput(element) {
+        element.addEventListener("input", function () {
+            if (this.value.length > 10) {
+                this.value = this.value.slice(0, 10);
+            }
+        });
+    }
+
+    limitMobileInput(document.getElementById("mobile"));
+    limitMobileInput(document.getElementById("father_mobile"));
+    limitMobileInput(document.getElementById("mother_mobile"));
+
+});
+</script>
 @endsection
