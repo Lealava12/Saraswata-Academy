@@ -26,7 +26,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Mobile <span class="text-danger">*</span></label>
-                    <input type="text" name="mobile" class="form-control @error('mobile') is-invalid @enderror" value="{{ old('mobile') }}" required>
+                    <input type="tel" maxlength="10" name="mobile" class="form-control @error('mobile') is-invalid @enderror" value="{{ old('mobile') }}" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Email</label>
@@ -85,7 +85,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Father's Mobile</label>
-                    <input type="text" name="father_mobile" class="form-control" value="{{ old('father_mobile') }}">
+                    <input type="tel" maxlength="10" name="father_mobile" class="form-control" value="{{ old('father_mobile') }}">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Mother's Name</label>
@@ -93,7 +93,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Mother's Mobile</label>
-                    <input type="text" name="mother_mobile" class="form-control" value="{{ old('mother_mobile') }}">
+                    <input type="tel" maxlength="10" name="mother_mobile" class="form-control" value="{{ old('mother_mobile') }}">
                 </div>
                 <div class="col-md-8">
                     <label class="form-label fw-medium">Address</label>

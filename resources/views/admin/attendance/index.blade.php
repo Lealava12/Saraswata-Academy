@@ -16,15 +16,25 @@
         <div class="table-responsive">
             <table class="table data-table table-hover w-100">
                 <thead class="table-light">
-                    <tr><th>#</th><th>Date</th><th>Class</th><th>Subject</th><th>Action</th></tr>
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>Class</th>
+                        <th>Subjects</th>
+                        <th>Action</th>
+                    </tr>
                 </thead>
                 <tbody>
                     @foreach($attendances as $i => $a)
                     <tr>
                         <td>{{ $i+1 }}</td>
-                        <td>{{ $a->attendance_date }}</td>
+                        <td>{{ $a->attendance_date->format('d-m-Y') }}</td>
                         <td>{{ $a->classInfo->name ?? '-' }}</td>
-                        <td>{{ $a->subject->name ?? '-' }}</td>
+                        <td>
+                            @foreach($a->subjects as $subject)
+                                <span class="badge bg-info">{{ $subject->name }}</span>
+                            @endforeach
+                        </td>
                         <td>
                             <a href="{{ route('admin.attendance.show', $a->id) }}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
                         </td>

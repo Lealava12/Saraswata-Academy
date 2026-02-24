@@ -412,6 +412,7 @@
                 class="nav-link {{ request()->routeIs('admin.reports.attendance') ? 'active' : '' }}">
                 <i class="bi bi-bar-chart-fill"></i> Attendance
             </a>
+            
             <a href="{{ route('admin.reports.exam') }}"
                 class="nav-link {{ request()->routeIs('admin.reports.exam') ? 'active' : '' }}">
                 <i class="bi bi-graph-up-arrow"></i> Exam

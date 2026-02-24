@@ -87,16 +87,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('study-materials/{material}/assign', [Admin\StudyMaterialController::class, 'doAssign'])->name('study-materials.do-assign');
 
         // Reports
-        Route::prefix('reports')->name('reports.')->group(function () {
-            Route::get('attendance', [Admin\ReportController::class, 'attendance'])->name('attendance');
-            Route::get('exam', [Admin\ReportController::class, 'exam'])->name('exam');
-            Route::get('fee', [Admin\ReportController::class, 'fee'])->name('fee');
-            Route::get('financial', [Admin\ReportController::class, 'financial'])->name('financial');
-            Route::get('export-pdf', [Admin\ReportController::class, 'exportPdf'])->name('export-pdf');
-            Route::get('export-csv', [Admin\ReportController::class, 'exportCsv'])->name('export-csv');
-        });
+      // Reports
+Route::prefix('reports')->name('reports.')->group(function () {
+    Route::get('attendance', [Admin\ReportController::class, 'attendance'])->name('attendance');
+    Route::post('get-students-by-class', [Admin\ReportController::class, 'getStudentsByClass'])->name('get-students-by-class');
+    Route::get('export-attendance-csv', [Admin\ReportController::class, 'exportAttendanceCsv'])->name('export-attendance-csv');
+    Route::get('export-attendance-pdf', [Admin\ReportController::class, 'exportAttendancePdf'])->name('export-attendance-pdf');
+    Route::get('exam', [Admin\ReportController::class, 'exam'])->name('exam');
+    Route::get('fee', [Admin\ReportController::class, 'fee'])->name('fee');
+    Route::get('financial', [Admin\ReportController::class, 'financial'])->name('financial');
+    Route::get('export-pdf', [Admin\ReportController::class, 'exportPdf'])->name('export-pdf');
+    Route::get('export-csv', [Admin\ReportController::class, 'exportCsv'])->name('export-csv');
+});
     });
 });
+
+
 
 // ─── STUDENT ROUTES ───────────────────────────────────────────────────────────
 Route::prefix('student')->name('student.')->group(function () {
