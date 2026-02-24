@@ -7,8 +7,8 @@
 </div>
 
 <!-- Summary Cards -->
-<div class="row g-3 mb-4">
-    <div class="col-md-4">
+<div class="row g-2 g-md-3 mb-4">
+    <div class="col-sm-6 col-md-4">
         <div class="stat-card" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;">
             <div class="small opacity-75">Total Paid</div>
             <div class="fs-3 fw-bold">₹{{ number_format($totalPaid) }}</div>
@@ -32,17 +32,17 @@
 <div class="card mb-3">
     <div class="card-body py-2">
         <form method="GET" class="row g-2 align-items-end">
-            <div class="col-auto">
+            <div class="col-6 col-md-auto">
                 <label class="form-label small fw-medium mb-1">From</label>
                 <input type="date" name="from_date" class="form-control form-control-sm" value="{{ request('from_date') }}">
             </div>
-            <div class="col-auto">
+            <div class="col-6 col-md-auto">
                 <label class="form-label small fw-medium mb-1">To</label>
                 <input type="date" name="to_date" class="form-control form-control-sm" value="{{ request('to_date') }}">
             </div>
-            <div class="col-auto">
-                <button class="btn btn-sm btn-outline-primary">Filter</button>
-                <a href="{{ route('student.fees') }}" class="btn btn-sm btn-light ms-1">Reset</a>
+            <div class="col-12 col-md-auto d-flex gap-1 mt-2 mt-md-0">
+                <button class="btn btn-sm btn-outline-primary flex-grow-1 flex-md-grow-0">Filter</button>
+                <a href="{{ route('student.fees') }}" class="btn btn-sm btn-light flex-grow-1 flex-md-grow-0">Reset</a>
             </div>
         </form>
     </div>

@@ -5,8 +5,8 @@
 <h5 class="fw-bold mb-4"><i class="bi bi-calendar-check me-2 text-primary"></i>Attendance Report</h5>
 
 <!-- Summary -->
-<div class="row g-3 mb-4">
-    <div class="col-md-3">
+<div class="row g-2 g-md-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
         <div class="card text-center">
             <div class="card-body">
                 <div class="display-6 fw-bold text-primary">{{ $total }}</div>
@@ -48,7 +48,8 @@
 <div class="card mb-4">
     <div class="card-header fw-semibold">Subject-wise Summary</div>
     <div class="card-body p-0">
-        <table class="table table-hover mb-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
             <thead class="table-light"><tr><th>Subject</th><th>Present</th><th>Absent</th><th>Total</th><th>%</th></tr></thead>
             <tbody>
                 @foreach($subjectSummary as $subj => $data)
@@ -62,7 +63,8 @@
                 </tr>
                 @endforeach
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 </div>
 @endif
@@ -71,15 +73,15 @@
 <div class="card mb-3">
     <div class="card-body py-2">
         <form method="GET" class="row g-2 align-items-end">
-            <div class="col-auto">
+            <div class="col-6 col-md-auto">
                 <input type="date" name="from_date" class="form-control form-control-sm" value="{{ request('from_date') }}" placeholder="From">
             </div>
-            <div class="col-auto">
+            <div class="col-6 col-md-auto">
                 <input type="date" name="to_date" class="form-control form-control-sm" value="{{ request('to_date') }}" placeholder="To">
             </div>
-            <div class="col-auto">
-                <button class="btn btn-sm btn-outline-primary">Filter</button>
-                <a href="{{ route('student.attendance') }}" class="btn btn-sm btn-light ms-1">Reset</a>
+            <div class="col-12 col-md-auto d-flex gap-1 mt-2 mt-md-0">
+                <button class="btn btn-sm btn-outline-primary flex-grow-1 flex-md-grow-0">Filter</button>
+                <a href="{{ route('student.attendance') }}" class="btn btn-sm btn-light flex-grow-1 flex-md-grow-0">Reset</a>
             </div>
         </form>
     </div>

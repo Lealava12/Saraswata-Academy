@@ -14,18 +14,18 @@
 <!-- Filter -->
 <div class="card mb-3">
     <div class="card-body py-2">
-        <form method="GET" class="d-flex gap-2 align-items-end flex-wrap">
-            <div>
-                <label class="form-label small">From</label>
+        <form method="GET" class="row g-2 align-items-end">
+            <div class="col-6 col-md-auto">
+                <label class="form-label small mb-1">From</label>
                 <input type="date" name="from_date" class="form-control form-control-sm" value="{{ request('from_date') }}">
             </div>
-            <div>
-                <label class="form-label small">To</label>
+            <div class="col-6 col-md-auto">
+                <label class="form-label small mb-1">To</label>
                 <input type="date" name="to_date" class="form-control form-control-sm" value="{{ request('to_date') }}">
             </div>
-            <div class="align-self-end">
-                <button class="btn btn-sm btn-outline-primary">Filter</button>
-                <a href="{{ route('student.exams') }}" class="btn btn-sm btn-light ms-1">Reset</a>
+            <div class="col-12 col-md-auto d-flex gap-1 mt-2 mt-md-0">
+                <button class="btn btn-sm btn-outline-primary flex-grow-1 flex-md-grow-0">Filter</button>
+                <a href="{{ route('student.exams') }}" class="btn btn-sm btn-light flex-grow-1 flex-md-grow-0">Reset</a>
             </div>
         </form>
     </div>
@@ -33,7 +33,8 @@
 
 <div class="card">
     <div class="card-body p-0">
-        <table class="table table-hover mb-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
             <thead class="table-light">
                 <tr><th>Date</th><th>Subject</th><th>Full Marks</th><th>Obtained</th><th>%</th><th>Grade</th></tr>
             </thead>
@@ -57,7 +58,8 @@
                 <tr><td colspan="6" class="text-center py-4 text-muted">No exam records found.</td></tr>
                 @endforelse
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 </div>
 @endsection

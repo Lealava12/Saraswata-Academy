@@ -6,7 +6,8 @@
 
 <div class="card">
     <div class="card-body p-0">
-        <table class="table table-hover mb-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
             <thead class="table-light">
                 <tr><th>#</th><th>Material Name</th><th>Description</th><th>Issue Date</th><th>Status</th></tr>
             </thead>
@@ -25,7 +26,8 @@
                 <tr><td colspan="5" class="text-center py-4 text-muted">No study materials assigned yet.</td></tr>
                 @endforelse
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 </div>
 @endsection
