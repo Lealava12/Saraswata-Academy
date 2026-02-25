@@ -7,16 +7,29 @@ use Illuminate\Database\Eloquent\Model;
 class StudentMaterial extends Model
 {
     protected $table = 'student_materials';
-    protected $fillable = ['student_id', 'material_id', 'issue_date', 'status', 'slug', 'is_active'];
-    protected $casts = ['issue_date' => 'date'];
+    protected $fillable = [
+        'student_id', 
+        'study_material_id',   
+        'issue_date', 
+        'status', 
+        'slug', 
+        'is_active'
+    ];
+    
+    protected $casts = [
+        'issue_date' => 'date',
+       
+    ];
 
     public function student()
     {
         return $this->belongsTo(Student::class);
     }
+    
     public function material()
     {
-        return $this->belongsTo(StudyMaterial::class, 'material_id');
+        // Use the correct foreign key
+        return $this->belongsTo(StudyMaterial::class, 'study_material_id');
     }
 
     protected static function boot()
@@ -24,4 +37,5 @@ class StudentMaterial extends Model
         parent::boot();
         static::creating(fn($m) => $m->slug = $m->slug ?: \Str::slug('sm-' . uniqid()));
     }
+    
 }

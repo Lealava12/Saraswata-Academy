@@ -74,7 +74,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('exams', Admin\ExamController::class)->except(['show']);
         Route::get('exams/{exam}/marks', [Admin\ExamController::class, 'marks'])->name('exams.marks');
         Route::post('exams/{exam}/marks', [Admin\ExamController::class, 'storeMarks'])->name('exams.marks.store');
-
+         Route::get('exams/export-pdf', [Admin\ExamController::class, 'exportPdf'])->name('exams.export-pdf');
+     Route::get('exams/{exam}/view-marks', [Admin\ExamController::class, 'viewMarks'])->name('exams.view-marks');
+    // Marks PDF export for specific exam
+    Route::get('exams/{exam}/marks-export-pdf', [Admin\ExamController::class, 'exportMarksPdf'])->name('exams.marks.export-pdf');
+    Route::get('exams/export-csv', [Admin\ExamController::class, 'exportCsv'])->name('exams.export-csv');
+Route::get('exams/{exam}/marks-export-csv', [Admin\ExamController::class, 'exportMarksCsv'])->name('exams.marks.export-csv');
+    
+    // View marks page
+    Route::get('exams/{exam}/view-marks', [Admin\ExamController::class, 'viewMarks'])->name('exams.view-marks');
         // Fees
         Route::get('fees', [Admin\FeeController::class, 'index'])->name('fees.index');
         Route::get('fees/create', [Admin\FeeController::class, 'create'])->name('fees.create');
@@ -82,9 +90,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('fees/verify-mpin', [Admin\FeeController::class, 'verifyMpin'])->name('fees.verify-mpin');
 
         // Study Material
+        // Study Material (Admin)
         Route::resource('study-materials', Admin\StudyMaterialController::class)->except(['show']);
-        Route::get('study-materials/{material}/assign', [Admin\StudyMaterialController::class, 'assign'])->name('study-materials.assign');
-        Route::post('study-materials/{material}/assign', [Admin\StudyMaterialController::class, 'doAssign'])->name('study-materials.do-assign');
+
+        Route::get('study-materials/{material}/assign', [Admin\StudyMaterialController::class, 'assign'])
+            ->name('study-materials.assign');
+
+        Route::post('study-materials/{material}/assign', [Admin\StudyMaterialController::class, 'doAssign'])
+            ->name('study-materials.do-assign');
+
+        Route::get('study-materials/{material}/assignments', [Admin\StudyMaterialController::class, 'viewAssignments'])
+            ->name('study-materials.assignments');
+
+        // update assignment status (Returned etc.)
+        Route::put('study-materials/assignment/{assignment}/update-status', [Admin\StudyMaterialController::class, 'updateStatus'])
+            ->name('study-materials.update-status');
+
 
         // Reports
       // Reports

@@ -11,7 +11,8 @@ class StudyMaterial extends Model
 
     public function studentMaterials()
     {
-        return $this->hasMany(StudentMaterial::class, 'material_id');
+        // Use the correct foreign key: study_material_id
+        return $this->hasMany(StudentMaterial::class, 'study_material_id');
     }
 
     protected static function boot()
