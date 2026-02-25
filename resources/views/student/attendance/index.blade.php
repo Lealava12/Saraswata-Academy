@@ -99,7 +99,7 @@
                     @forelse($records as $r)
                     <tr>
                         <td>{{ optional(optional($r->attendance))->attendance_date ?? '-' }}</td>
-                        <td>{{ optional(optional($r->attendance)->subject)->name ?? '-' }}</td>
+                        <td>{{ optional($r->attendance)->subjects?->pluck('name')->join(', ') ?: '-' }}</td>
                         <td>
                             <span class="badge {{ $r->status === 'Present' ? 'badge-present' : 'badge-absent' }} rounded-pill px-3">
                                 {{ $r->status }}

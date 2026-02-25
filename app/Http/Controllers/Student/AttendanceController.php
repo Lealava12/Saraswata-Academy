@@ -14,7 +14,7 @@ class AttendanceController extends Controller
         $student = Auth::guard('student')->user();
 
         $query = AttendanceDetail::where('student_id', $student->id)
-            ->with(['attendance.subject', 'attendance.classInfo'])
+            ->with(['attendance.subjects', 'attendance.classInfo'])
             ->whereHas('attendance', fn($q) => $q);
 
         if ($request->filled('from_date') && $request->filled('to_date')) {
@@ -33,7 +33,7 @@ class AttendanceController extends Controller
         $percentage = $total > 0 ? round(($presentCount / $total) * 100, 1) : 0;
 
         // Subject-wise summary
-        $subjectSummary = $records->groupBy(fn($r) => optional(optional($r->attendance)->subject)->name ?? 'Unknown')
+        $subjectSummary = $records->groupBy(fn($r) => optional($r->attendance)->subjects?->pluck('name')->join(', ') ?: 'Unknown')
             ->map(fn($group) => [
                 'present' => $group->where('status', 'Present')->count(),
                 'absent' => $group->where('status', 'Absent')->count(),
