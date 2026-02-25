@@ -22,7 +22,7 @@ class TeacherSalaryController extends Controller
             return redirect()->route('admin.teacher-salary.index')->with('error', 'Authentication required.');
         }
         session()->forget('mpin_unlocked'); // Force re-auth for next enter
-        $teachers = Teacher::where('is_active', 1)->get();
+        $teachers = Teacher::where('is_active', 1)->with('classes')->get();
         return view('admin.teacher-salary.create', compact('teachers'));
     }
 
@@ -42,6 +42,7 @@ class TeacherSalaryController extends Controller
             'payment_month' => $request->payment_month,
             'payment_date' => $request->payment_date,
             'class_count' => $request->class_count ?? 0,
+            'class_id' => $request->class_id,
             'slug' => Str::slug('tsal-' . uniqid()),
         ]);
 

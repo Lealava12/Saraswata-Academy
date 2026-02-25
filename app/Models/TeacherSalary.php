@@ -13,6 +13,7 @@ class TeacherSalary extends Model
         'payment_month',
         'payment_date',
         'class_count',
+        'class_id',
         'slug',
         'is_active',
     ];
@@ -20,6 +21,11 @@ class TeacherSalary extends Model
     public function teacher()
     {
         return $this->belongsTo(Teacher::class);
+    }
+
+    public function class()
+    {
+        return $this->belongsTo(Classes::class);
     }
 
     protected static function boot()

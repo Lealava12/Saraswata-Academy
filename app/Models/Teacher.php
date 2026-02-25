@@ -20,6 +20,10 @@ class Teacher extends Model
     {
         return $this->belongsToMany(Subject::class, 'teacher_subjects');
     }
+    public function classes()
+    {
+        return $this->belongsToMany(Classes::class, 'teacher_classes', 'teacher_id', 'class_id')->withPivot('amount')->withTimestamps();
+    }
     public function teacherSubjects()
     {
         return $this->hasMany(TeacherSubject::class);

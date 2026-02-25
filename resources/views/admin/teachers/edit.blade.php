@@ -50,6 +50,37 @@
                         @endforeach
                     </div>
                 </div>
+                <div class="col-12 mt-3">
+                    <label class="form-label fw-medium">Class-wise Salary Mapping</label>
+                    <div class="row g-3">
+                        @foreach($classes as $c)
+                        @php
+                            $oldClasses = old('classes');
+                            $isChecked = is_array($oldClasses) 
+                                ? in_array($c->id, $oldClasses) 
+                                : array_key_exists($c->id, $classSalaries ?? []);
+                            
+                            $salaryValue = old('class_salaries.' . $c->id, $isChecked ? ($classSalaries[$c->id] ?? '') : '');
+                        @endphp
+                        <div class="col-md-4 col-sm-6">
+                            <div class="card bg-light border-0">
+                                <div class="card-body p-3">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input class-checkbox" type="checkbox" name="classes[]" id="cls{{ $c->id }}" value="{{ $c->id }}"
+                                            {{ $isChecked ? 'checked' : '' }} onchange="toggleSalaryInput({{ $c->id }})">
+                                        <label class="form-check-label fw-medium" for="cls{{ $c->id }}">{{ $c->name }}</label>
+                                    </div>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">₹</span>
+                                        <input type="number" name="class_salaries[{{ $c->id }}]" id="salary{{ $c->id }}" class="form-control salary-input" placeholder="Salary Amount"
+                                            value="{{ $salaryValue }}" {{ $isChecked ? '' : 'disabled' }}>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
                 <div class="col-12 mt-2">
                     <button type="submit" class="btn btn-accent px-4"><i class="bi bi-check-lg me-2"></i>Update</button>
                     <a href="{{ route('admin.teachers.index') }}" class="btn btn-light ms-2">Cancel</a>
@@ -59,3 +90,20 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function toggleSalaryInput(classId) {
+        let checkbox = document.getElementById('cls' + classId);
+        let input = document.getElementById('salary' + classId);
+        if (checkbox.checked) {
+            input.disabled = false;
+            input.required = true;
+        } else {
+            input.disabled = true;
+            input.required = false;
+            input.value = ''; // clear value if unchecked
+        }
+    }
+</script>
+@endpush

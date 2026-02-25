@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Teacher;
 use App\Models\Subject;
 use App\Models\TeacherSubject;
+use App\Models\Classes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -24,7 +25,8 @@ class TeacherController extends Controller
         }
         session()->forget('mpin_unlocked');
         $subjects = Subject::where('is_active', 1)->get();
-        return view('admin.teachers.create', compact('subjects'));
+        $classes = Classes::where('is_active', 1)->get();
+        return view('admin.teachers.create', compact('subjects', 'classes'));
     }
 
     public function store(Request $request)
@@ -34,6 +36,8 @@ class TeacherController extends Controller
             'mobile' => 'required|string|max:15',
             'joining_date' => 'required|date',
             'subjects' => 'array',
+            'classes' => 'array',
+            'class_salaries' => 'array',
         ]);
 
         $teacher = Teacher::create([
@@ -53,6 +57,16 @@ class TeacherController extends Controller
             ]);
         }
 
+        // Attach Classes with their corresponding salaries
+        if ($request->has('classes') && is_array($request->classes)) {
+            $classData = [];
+            foreach ($request->classes as $classId) {
+                $amount = $request->input("class_salaries.{$classId}");
+                $classData[$classId] = ['amount' => $amount ?: 0];
+            }
+            $teacher->classes()->attach($classData);
+        }
+
         return redirect()->route('admin.teachers.index')->with('success', 'Teacher created.');
     }
 
@@ -60,7 +74,9 @@ class TeacherController extends Controller
     {
         $subjects = Subject::where('is_active', 1)->get();
         $assignedSubjects = $teacher->subjects->pluck('id')->toArray();
-        return view('admin.teachers.edit', compact('teacher', 'subjects', 'assignedSubjects'));
+        $classes = Classes::where('is_active', 1)->get();
+        $classSalaries = $teacher->classes->pluck('pivot.amount', 'id')->toArray();
+        return view('admin.teachers.edit', compact('teacher', 'subjects', 'assignedSubjects', 'classes', 'classSalaries'));
     }
 
     public function update(Request $request, Teacher $teacher)
@@ -69,6 +85,9 @@ class TeacherController extends Controller
             'name' => 'required|string|max:100',
             'mobile' => 'required|string|max:15',
             'joining_date' => 'required|date',
+            'subjects' => 'array',
+            'classes' => 'array',
+            'class_salaries' => 'array',
         ]);
 
         $data = $request->only('name', 'mobile', 'address', 'joining_date', 'is_active');
@@ -83,6 +102,16 @@ class TeacherController extends Controller
                 'slug' => Str::slug('ts-' . uniqid()),
             ]);
         }
+
+        // Re-sync classes and salaries
+        $classData = [];
+        if ($request->has('classes') && is_array($request->classes)) {
+            foreach ($request->classes as $classId) {
+                $amount = $request->input("class_salaries.{$classId}");
+                $classData[$classId] = ['amount' => $amount ?: 0];
+            }
+        }
+        $teacher->classes()->sync($classData);
 
         return redirect()->route('admin.teachers.index')->with('success', 'Teacher updated.');
     }

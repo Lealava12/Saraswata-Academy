@@ -12,13 +12,14 @@
         <div class="table-responsive">
             <table class="table data-table table-hover w-100">
                 <thead class="table-light">
-                    <tr><th>#</th><th>Teacher</th><th>Month</th><th>Amount</th><th>Payment Date</th><th>Classes</th><th>Action</th></tr>
+                    <tr><th>#</th><th>Teacher</th><th>Class</th><th>Month</th><th>Amount</th><th>Payment Date</th><th>Classes</th><th>Action</th></tr>
                 </thead>
                 <tbody>
                     @foreach($salaries as $i => $s)
                     <tr>
                         <td>{{ $i+1 }}</td>
                         <td>{{ $s->teacher->name ?? '-' }}</td>
+                        <td>{{ $s->class->name ?? '-' }}</td>
                         <td>{{ $s->payment_month }}</td>
                         <td class="fw-semibold">₹{{ number_format($s->amount) }}</td>
                         <td>{{ $s->payment_date }}</td>
