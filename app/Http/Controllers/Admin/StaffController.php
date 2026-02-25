@@ -48,7 +48,7 @@ class StaffController extends Controller
     }
 
     public function edit(Staff $staff)
-    {
+    { 
         return view('admin.staff.edit', compact('staff'));
     }
 

@@ -14,8 +14,13 @@ class Staff extends Model
         'joining_date',
         'slug',
         'is_active',
+        
     ];
-
+protected $casts = [
+        'joining_date' => 'date',
+        'is_active' => 'boolean',
+        'monthly_salary' => 'decimal:2',
+    ];
 
     public function salaries()
     {

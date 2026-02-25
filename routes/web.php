@@ -59,9 +59,11 @@ Route::post('reset-password', [Admin\AuthController::class, 'resetPassword'])->n
         // Teachers
         Route::resource('teachers', Admin\TeacherController::class)->except(['show']);
         Route::get('teachers/verify-mpin', [Admin\TeacherController::class, 'verifyMpin'])->name('teachers.verify-mpin');
+            Route::get('teachers/{teacher}', [Admin\TeacherController::class, 'show'])
+        ->name('teachers.show');
 
         // Teacher Salary
-        Route::resource('teacher-salary', Admin\TeacherSalaryController::class)->only(['index', 'create', 'store', 'destroy']);
+        Route::resource('teacher-salary', Admin\TeacherSalaryController::class)->only(['index', 'create', 'store', 'destroy', 'show']);
         Route::post('teacher-salary/verify-mpin', [Admin\TeacherSalaryController::class, 'verifyMpin'])->name('teacher-salary.verify-mpin');
 
         // Staff

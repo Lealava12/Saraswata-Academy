@@ -68,7 +68,12 @@
                                     <div class="form-check mb-2">
                                         <input class="form-check-input class-checkbox" type="checkbox" name="classes[]" id="cls{{ $c->id }}" value="{{ $c->id }}"
                                             {{ $isChecked ? 'checked' : '' }} onchange="toggleSalaryInput({{ $c->id }})">
-                                        <label class="form-check-label fw-medium" for="cls{{ $c->id }}">{{ $c->name }}</label>
+                                         <label class="form-check-label fw-medium" for="cls{{ $c->id }}">
+                                            {{ $c->name }}
+                                            ({{ $c->board?->name ?? 'N/A' }})
+                                        </label>
+
+                                        
                                     </div>
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">₹</span>
