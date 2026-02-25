@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forgot Password – Student Portal</title>
+    <title>Verify OTP – Student Portal</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -65,9 +65,9 @@
 
                         <div class="text-center mb-4">
                             <div class="login-logo">
-                                <i class="bi bi-envelope-lock text-white fs-2"></i>
+                                <i class="bi bi-shield-check text-white fs-2"></i>
                             </div>
-                            <h4 class="fw-bold">Forgot Password</h4>
+                            <h4 class="fw-bold">OTP Verification</h4>
                             <p class="text-muted small">Student Portal · Saraswata Academy</p>
                         </div>
 
@@ -79,23 +79,23 @@
                         <div class="alert alert-danger">{{ $errors->first() }}</div>
                         @endif
 
-                        <form method="POST" action="{{ route('student.forgot.otp') }}">
+                        <form method="POST" action="{{ route('student.verify.otp') }}">
                             @csrf
 
                             <div class="mb-3">
-                                <label class="form-label fw-medium">Registered Email</label>
+                                <label class="form-label fw-medium">Enter 6-digit OTP</label>
 
                                 <div class="input-group">
                                     <span class="input-group-text">
-                                        <i class="bi bi-envelope"></i>
+                                        <i class="bi bi-key"></i>
                                     </span>
 
-                                    <input type="email" name="email"
-                                        class="form-control @error('email') is-invalid @enderror"
-                                        placeholder="Enter registered email" required>
+                                    <input type="text" name="otp"
+                                        class="form-control text-center @error('otp') is-invalid @enderror"
+                                        placeholder="••••••" maxlength="6" pattern="[0-9]{6}" required>
                                 </div>
 
-                                @error('email')
+                                @error('otp')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
 
@@ -103,8 +103,8 @@
 
                             <div class="d-grid mt-4">
                                 <button type="submit" class="btn btn-primary py-2 fw-semibold">
-                                    <i class="bi bi-send me-2"></i>
-                                    Send OTP
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Verify OTP
                                 </button>
                             </div>
 

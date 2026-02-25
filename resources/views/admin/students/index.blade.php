@@ -54,10 +54,10 @@
                                 <a href="{{ route('admin.students.fee-history', $s->id) }}" class="btn btn-sm btn-outline-success" title="Fee History">
                                     <i class="bi bi-cash-coin"></i>
                                 </a>
-                                <form method="POST" action="{{ route('admin.students.destroy', $s->id) }}" class="d-inline" onsubmit="return confirm('Remove this student?')">
+                                <!-- <form method="POST" action="{{ route('admin.students.destroy', $s->id) }}" class="d-inline" onsubmit="return confirm('Remove this student?')">
                                     @csrf @method('DELETE')
                                     <button class="btn btn-sm btn-outline-danger" title="Remove"><i class="bi bi-trash"></i></button>
-                                </form>
+                                </form> -->
                             </div>
                         </td>
                     </tr>

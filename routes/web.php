@@ -6,7 +6,12 @@ use App\Http\Controllers\Student;
 
 // Root redirect
 Route::get('/', fn() => redirect()->route('admin.login'));
-
+Route::get('/mail-test', function () {
+    \Mail::raw('Mail test from Saraswata Academy', function ($m) {
+        $m->to('alamkhank2015@gmail.com')->subject('SMTP Test');
+    });
+    return 'sent';
+});
 // ─── ADMIN ROUTES ────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
 
@@ -14,11 +19,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('login', [Admin\AuthController::class, 'showLogin'])->name('login');
     Route::post('login', [Admin\AuthController::class, 'login'])->name('login.post');
     Route::get('logout', [Admin\AuthController::class, 'logout'])->name('logout');
-    Route::get('forgot-password', [Admin\AuthController::class, 'showForgot'])->name('forgot');
-    Route::post('forgot-password', [Admin\AuthController::class, 'sendOtp'])->name('forgot.otp');
-    Route::post('verify-otp', [Admin\AuthController::class, 'verifyOtp'])->name('verify.otp');
-    Route::post('reset-password', [Admin\AuthController::class, 'resetPassword'])->name('reset.password');
+  
 
+
+Route::get('forgot-password', [Admin\AuthController::class, 'showForgot'])->name('forgot');
+Route::post('forgot-password', [Admin\AuthController::class, 'sendOtp'])->name('forgot.otp');
+
+Route::get('verify-otp', [Admin\AuthController::class, 'showVerifyOtp'])->name('verify.otp.form');
+Route::post('verify-otp', [Admin\AuthController::class, 'verifyOtp'])->name('verify.otp');
+
+Route::get('reset-password', [Admin\AuthController::class, 'showResetPassword'])->name('reset.password.form');
+Route::post('reset-password', [Admin\AuthController::class, 'resetPassword'])->name('reset.password');
     // Authenticated routes
     Route::middleware('admin.auth')->group(function () {
 
@@ -134,7 +145,11 @@ Route::prefix('student')->name('student.')->group(function () {
     Route::get('logout', [Student\AuthController::class, 'logout'])->name('logout');
     Route::get('forgot-password', [Student\AuthController::class, 'showForgot'])->name('forgot');
     Route::post('forgot-password', [Student\AuthController::class, 'sendOtp'])->name('forgot.otp');
+
+    Route::get('verify-otp', [Student\AuthController::class, 'showVerifyOtp'])->name('verify.otp.form');
     Route::post('verify-otp', [Student\AuthController::class, 'verifyOtp'])->name('verify.otp');
+
+    Route::get('reset-password', [Student\AuthController::class, 'showResetPassword'])->name('reset.password.form');
     Route::post('reset-password', [Student\AuthController::class, 'resetPassword'])->name('reset.password');
 
     // Authenticated routes

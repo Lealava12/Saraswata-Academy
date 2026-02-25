@@ -18,7 +18,8 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Mobile <span class="text-danger">*</span></label>
-                    <input type="text" name="mobile" class="form-control" value="{{ old('mobile', $teacher->mobile) }}" required>
+                    <input type="number" name="mobile" class="form-control" value="{{ old('mobile', $teacher->mobile) }}" oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);"  required>
+                   
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Joining Date <span class="text-danger">*</span></label>

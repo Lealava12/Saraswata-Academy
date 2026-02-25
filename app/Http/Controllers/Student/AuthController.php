@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Carbon;
 class AuthController extends Controller
 {
     public function showLogin()
@@ -17,6 +19,28 @@ class AuthController extends Controller
         }
         return view('student.auth.login');
     }
+    public function showForgot()
+{
+    return view('student.auth.forgot-password');
+}
+public function showVerifyOtp()
+{
+    if (!session('student_reset_email')) {
+        return redirect()->route('student.forgot')
+            ->withErrors(['email' => 'Please request OTP first.']);
+    }
+
+    return view('student.auth.verify-otp');
+}
+public function showResetPassword()
+{
+    if (session('student_otp_verified') !== true || !session('student_reset_email')) {
+        return redirect()->route('student.forgot')
+            ->withErrors(['email' => 'Please verify OTP first.']);
+    }
+
+    return view('student.auth.reset-password');
+}
 
     public function login(Request $request)
     {
@@ -44,43 +68,91 @@ class AuthController extends Controller
         return redirect()->route('student.login')->with('success', 'Logged out successfully.');
     }
 
-    public function showForgot()
-    {
-        return view('student.auth.forgot');
+     
+
+   public function sendOtp(Request $request)
+{
+    $request->validate(['email' => 'required|email']);
+
+    $student = Student::where('email', $request->email)
+        ->where('is_active', 1)
+        ->first();
+
+    if (!$student) {
+        return back()->withErrors(['email' => 'Email not found or account disabled.']);
     }
 
-    public function sendOtp(Request $request)
-    {
-        $request->validate(['mobile' => 'required']);
-        $student = Student::where('mobile', $request->mobile)->first();
-        if (!$student) {
-            return back()->withErrors(['mobile' => 'Mobile number not found.']);
+    $otp = random_int(100000, 999999);
+
+    DB::table('password_reset_tokens')->updateOrInsert(
+        ['email' => $request->email],
+        ['token' => Hash::make($otp), 'created_at' => now()]
+    );
+
+    Mail::raw(
+        "Your OTP for student password reset is: {$otp}\n\nThis OTP will expire in 10 minutes.",
+        function ($m) use ($request) {
+            $m->to($request->email)->subject('Student Password Reset OTP');
         }
-        $otp = rand(100000, 999999);
-        session(['student_forgot_otp' => $otp, 'student_forgot_mobile' => $request->mobile]);
-        \Log::info("Student OTP for {$request->mobile}: {$otp}");
-        return back()->with('success', "OTP sent! (Demo OTP: {$otp})");
+    );
+
+    session([
+        'student_reset_email' => $request->email,
+        'student_otp_verified' => false,
+    ]);
+
+    return redirect()->route('student.verify.otp.form')->with('success', 'OTP sent to your email.');
+}
+
+   public function verifyOtp(Request $request)
+{
+    $request->validate(['otp' => 'required|digits:6']);
+
+    $email = session('student_reset_email');
+    if (!$email) {
+        return redirect()->route('student.forgot')
+            ->withErrors(['email' => 'Session expired. Please request OTP again.']);
     }
 
-    public function verifyOtp(Request $request)
-    {
-        $request->validate(['otp' => 'required']);
-        if ($request->otp == session('student_forgot_otp')) {
-            session(['student_otp_verified' => true]);
-            return response()->json(['success' => true]);
-        }
-        return response()->json(['success' => false, 'message' => 'Invalid OTP']);
+    $row = DB::table('password_reset_tokens')->where('email', $email)->first();
+    if (!$row) {
+        return back()->withErrors(['otp' => 'OTP not found. Please request again.']);
     }
 
-    public function resetPassword(Request $request)
-    {
-        $request->validate(['password' => 'required|min:6|confirmed']);
-        if (!session('student_otp_verified')) {
-            return back()->with('error', 'OTP not verified.');
-        }
-        $mobile = session('student_forgot_mobile');
-        Student::where('mobile', $mobile)->update(['password' => Hash::make($request->password)]);
-        session()->forget(['student_forgot_otp', 'student_forgot_mobile', 'student_otp_verified']);
-        return redirect()->route('student.login')->with('success', 'Password reset successfully.');
+    if (Carbon::parse($row->created_at)->addMinutes(10)->isPast()) {
+        return back()->withErrors(['otp' => 'OTP expired. Please request again.']);
     }
+
+    if (!Hash::check($request->otp, $row->token)) {
+        return back()->withErrors(['otp' => 'Invalid OTP.']);
+    }
+
+    session(['student_otp_verified' => true]);
+
+    return redirect()->route('student.reset.password.form')->with('success', 'OTP verified. Now reset password.');
+}
+
+   public function resetPassword(Request $request)
+{
+    $request->validate([
+        'password' => 'required|min:6|confirmed',
+    ]);
+
+    $email = session('student_reset_email');
+
+    if (!$email || session('student_otp_verified') !== true) {
+        return redirect()->route('student.forgot')
+            ->withErrors(['email' => 'Please verify OTP first.']);
+    }
+
+    Student::where('email', $email)->update([
+        'password' => Hash::make($request->password)
+    ]);
+
+    DB::table('password_reset_tokens')->where('email', $email)->delete();
+
+    session()->forget(['student_reset_email', 'student_otp_verified']);
+
+    return redirect()->route('student.login')->with('success', 'Password reset successfully. Please login.');
+}
 }
