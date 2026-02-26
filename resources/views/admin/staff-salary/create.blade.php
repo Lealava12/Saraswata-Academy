@@ -48,10 +48,29 @@
 
 @push('scripts')
 <script>
-$('#staffSel').on('change', function() {
-    const sal = $(this).find(':selected').data('salary');
-    if (sal > 0) { $('#staffAmtField').val(sal); $('#staffSalHint').text('Default monthly: ₹' + sal); }
-    else { $('#staffSalHint').text(''); }
+$(document).ready(function() {
+
+    // Auto fill salary
+    $('#staffSel').on('change', function() {
+        const sal = $(this).find(':selected').data('salary');
+        if (sal > 0) {
+            $('#staffAmtField').val(sal);
+            $('#staffSalHint').text('Default monthly: ₹' + sal);
+        } else {
+            $('#staffSalHint').text('');
+        }
+    });
+
+    // Confirm before submit
+    $('#staffSalForm').on('submit', function(e) {
+        e.preventDefault(); // Stop normal submit
+
+        if (confirm("Are you sure you want to pay this salary?")) {
+            this.submit(); // Submit if confirmed
+        }
+        // If cancel -> do nothing (form will not submit)
+    });
+
 });
 </script>
 @endpush

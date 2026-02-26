@@ -21,12 +21,12 @@
                     <td>
                         <div class="d-flex gap-1">
                             <a href="{{ route('admin.admins.edit', $a->id) }}" class="btn btn-sm btn-outline-primary" {{ auth('admin')->id() === $a->id ? 'disabled' : '' }}><i class="bi bi-pencil"></i></a>
-                            @if(auth('admin')->id() !== $a->id)
+                            <!-- @if(auth('admin')->id() !== $a->id)
                             <form method="POST" action="{{ route('admin.admins.destroy', $a->id) }}" class="d-inline" onsubmit="return confirm('Remove?')">
                                 @csrf @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
                             </form>
-                            @endif
+                            @endif -->
                         </div>
                     </td>
                 </tr>
