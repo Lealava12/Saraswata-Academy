@@ -120,7 +120,10 @@
                             @forelse($overdueStudents as $fee)
                             <tr>
                                 <td>{{ $fee->student->name ?? '-' }}</td>
-                                <td>{{ $fee->due_date }}</td>
+                                <td>
+                                    {{ \Carbon\Carbon::parse($fee->due_date)->format('d M, Y') }}<br>
+                                    <span class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle-fill"></i> Late Payment!</span>
+                                </td>
                                 <td class="text-danger fw-semibold">₹{{ number_format($fee->amount) }}</td>
                             </tr>
                             @empty

@@ -43,9 +43,9 @@
                     <td>{{ $fee->student->student_id ?? '-' }}</td>
                     <td>{{ $fee->classInfo->name ?? '-' }}</td>
                     <td class="fw-semibold">₹{{ number_format($fee->amount, 2) }}</td>
-                    <td>{{ $fee->payment_date }}</td>
+                    <td>{{ $fee->payment_date ? \Carbon\Carbon::parse($fee->payment_date)->format('d M, Y') : '-' }}</td>
                     <td>{{ $fee->payment_mode }}</td>
-                    <td>{{ $fee->due_date }}</td>
+                    <td>{{ \Carbon\Carbon::parse($fee->due_date)->format('d M, Y') }}</td>
                     <td>
                         @if($fee->status === 'Paid')
                             <span class="badge badge-paid rounded-pill px-3">Paid</span>
@@ -53,6 +53,7 @@
                             <span class="badge badge-due rounded-pill px-3">Due</span>
                         @else
                             <span class="badge badge-overdue rounded-pill px-3">Overdue</span>
+                            <div class="text-danger small mt-1 fw-bold"><i class="bi bi-exclamation-triangle-fill"></i> Late Payment!</div>
                         @endif
                     </td>
                 </tr>

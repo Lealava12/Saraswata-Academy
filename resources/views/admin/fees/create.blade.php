@@ -17,7 +17,7 @@
                     <select name="student_id" id="studentSelect" class="form-select" required>
                         <option value="">-- Select Student --</option>
                         @foreach($students as $s)
-                        <option value="{{ $s->id }}" data-fee="{{ $s->classInfo->monthly_fee ?? 0 }}">
+                        <option value="{{ $s->id }}" data-fee="{{ $s->classInfo->monthly_fee ?? 0 }}" data-join="{{ $s->joining_date }}">
                             {{ $s->name }} ({{ $s->student_id }})
                         </option>
                         @endforeach
@@ -60,14 +60,47 @@
 
 @push('scripts')
 <script>
-// Show class fee hint
+// Show class fee hint and compute due date
 $('#studentSelect').on('change', function() {
-    const fee = $(this).find(':selected').data('fee');
+    const selected = $(this).find(':selected');
+    const fee = selected.data('fee');
+    const joinDateStr = selected.data('join');
+    
     if (fee > 0) {
         $('#feeHint').text('Class monthly fee: ₹' + fee);
         $('#amountField').val(fee);
     } else {
         $('#feeHint').text('');
+    }
+
+    if (joinDateStr) {
+        // Calculate due date (due day from joining date, current month/year)
+        const parts = joinDateStr.split('-');
+        if (parts.length === 3) {
+            const joinDay = parseInt(parts[2], 10);
+            const now = new Date();
+            let y = now.getFullYear();
+            let m = now.getMonth();
+            let d = new Date(y, m, joinDay);
+            // Handle max days variation (e.g. Feb 30 -> Mar 2)
+            if (d.getMonth() !== m) {
+                d = new Date(y, m + 1, 0);
+            }
+            const fm = String(d.getMonth() + 1).padStart(2, '0');
+            const fd = String(d.getDate()).padStart(2, '0');
+            $('input[name="due_date"]').val(`${d.getFullYear()}-${fm}-${fd}`);
+        }
+    } else {
+        $('input[name="due_date"]').val('');
+    }
+});
+
+// Amount mismatch alert check
+$('#amountField').on('blur', function() {
+    const entered = parseFloat($(this).val()) || 0;
+    const fixedInfo = parseFloat($('#studentSelect').find(':selected').data('fee')) || 0;
+    if (fixedInfo > 0 && Math.abs(entered - fixedInfo) > 0.01) {
+        alert('Warning: Entered amount (₹' + entered + ') differs from the fixed class fee (₹' + fixedInfo + ').');
     }
 });
 
