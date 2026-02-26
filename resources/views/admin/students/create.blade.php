@@ -51,12 +51,17 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Class <span class="text-danger">*</span></label>
-                    <select name="class_id" class="form-select @error('class_id') is-invalid @enderror" required>
+                    <select name="class_id" id="class_id" class="form-select @error('class_id') is-invalid @enderror" required>
                         <option value="">-- Select Class --</option>
                         @foreach($classes as $c)
-                        <option value="{{ $c->id }}" {{ old('class_id') == $c->id ? 'selected' : '' }}>{{ $c->name }} ({{ $c->board->name ?? '' }})</option>
+                        <option value="{{ $c->id }}" data-board="{{ $c->board_id }}" data-fee="{{ $c->monthly_fee }}" {{ old('class_id') == $c->id ? 'selected' : '' }}>{{ $c->name }} ({{ $c->board->name ?? '' }})</option>
                         @endforeach
                     </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-medium">Monthly Fees <span class="text-danger">*</span></label>
+                    <input type="number" step="0.01" name="monthly_fees" id="monthly_fees" class="form-control @error('monthly_fees') is-invalid @enderror" value="{{ old('monthly_fees', 0) }}" required >
+                    @error('monthly_fees')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Joining Date <span class="text-danger">*</span></label>
@@ -69,6 +74,10 @@
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Photo</label>
                     <input type="file" name="photo" class="form-control" accept="image/*">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-medium">Progress Report</label>
+                    <input type="file" name="progress_report" class="form-control" accept=".pdf,image/*">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Status</label>
@@ -122,6 +131,52 @@ document.addEventListener("DOMContentLoaded", function () {
     limitMobileInput(document.getElementById("mobile"));
     limitMobileInput(document.getElementById("father_mobile"));
     limitMobileInput(document.getElementById("mother_mobile"));
+
+    // Dynamic class filtering and fee assignment
+    const boardSelect = document.querySelector('select[name="board_id"]');
+    const classSelect = document.getElementById('class_id');
+    const classOptions = Array.from(classSelect.querySelectorAll('option'));
+    const monthlyFeesInput = document.getElementById('monthly_fees');
+
+    function filterClasses() {
+        const selectedBoardId = boardSelect.value;
+        let firstValidOption = null;
+
+        classOptions.forEach(option => {
+            if (option.value === "") {
+                option.style.display = 'block';
+                return;
+            }
+
+            if (!selectedBoardId || option.dataset.board === selectedBoardId) {
+                option.style.display = 'block';
+                if(!firstValidOption) firstValidOption = option;
+            } else {
+                option.style.display = 'none';
+                if (classSelect.value === option.value) {
+                    classSelect.value = '';
+                }
+            }
+        });
+        
+        updateFees();
+    }
+
+    function updateFees() {
+        const selectedOption = classSelect.options[classSelect.selectedIndex];
+        if (selectedOption && selectedOption.dataset.fee) {
+            monthlyFeesInput.value = selectedOption.dataset.fee;
+        } else {
+            monthlyFeesInput.value = 0;
+        }
+    }
+
+    boardSelect.addEventListener('change', filterClasses);
+    classSelect.addEventListener('change', updateFees);
+
+    // Initial run in case of old inputs
+    filterClasses();
+    updateFees();
 
 });
 </script>

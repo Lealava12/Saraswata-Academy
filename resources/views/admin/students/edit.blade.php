@@ -38,11 +38,15 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Class <span class="text-danger">*</span></label>
-                    <select name="class_id" class="form-select" required>
+                    <select name="class_id" id="class_id" class="form-select" required>
                         @foreach($classes as $c)
-                        <option value="{{ $c->id }}" {{ $student->class_id == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                        <option value="{{ $c->id }}" data-board="{{ $c->board_id }}" data-fee="{{ $c->monthly_fee }}" {{ $student->class_id == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
                         @endforeach
                     </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-medium">Monthly Fees <span class="text-danger">*</span></label>
+                    <input type="number" step="0.01" name="monthly_fees" id="monthly_fees" class="form-control" value="{{ old('monthly_fees', $student->monthly_fees) }}" required readonly>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Joining Date <span class="text-danger">*</span></label>
@@ -66,6 +70,16 @@
                 <div class="col-md-4">
                     <label class="form-label fw-medium">New Photo</label>
                     <input type="file" name="photo" class="form-control" accept="image/*">
+                    @if($student->photo)
+                        <div class="mt-2"><a href="{{ asset('storage/' . $student->photo) }}" target="_blank" class="small">View Current Photo</a></div>
+                    @endif
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-medium">Progress Report <small class="text-muted">(Upload new to replace)</small></label>
+                    <input type="file" name="progress_report" class="form-control" accept=".pdf,image/*">
+                    @if($student->progress_report)
+                        <div class="mt-2"><a href="{{ asset('storage/' . $student->progress_report) }}" target="_blank" class="small">View Current Report</a></div>
+                    @endif
                 </div>
                 <div class="col-12"><hr class="my-1"><h6 class="text-muted fw-semibold">Parent Details</h6></div>
                 <div class="col-md-4">
@@ -96,4 +110,45 @@
         </form>
     </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const boardSelect = document.querySelector('select[name="board_id"]');
+    const classSelect = document.getElementById('class_id');
+    const classOptions = Array.from(classSelect.querySelectorAll('option'));
+    const monthlyFeesInput = document.getElementById('monthly_fees');
+
+    function filterClasses() {
+        const selectedBoardId = boardSelect.value;
+
+        classOptions.forEach(option => {
+            if (!selectedBoardId || option.dataset.board === selectedBoardId) {
+                option.style.display = 'block';
+            } else {
+                option.style.display = 'none';
+                if (classSelect.value === option.value) {
+                    classSelect.value = '';
+                }
+            }
+        });
+        
+    }
+
+    function updateFees() {
+        const selectedOption = classSelect.options[classSelect.selectedIndex];
+        if (selectedOption && selectedOption.dataset.fee) {
+            monthlyFeesInput.value = selectedOption.dataset.fee;
+        } else {
+            monthlyFeesInput.value = 0;
+        }
+    }
+
+    boardSelect.addEventListener('change', filterClasses);
+    
+    // Only update fees on manual class change to avoid overriding current DB value on load
+    classSelect.addEventListener('change', updateFees);
+
+    // Initial run to filter but NOT update fee
+    filterClasses();
+});
+</script>
 @endsection

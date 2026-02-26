@@ -23,6 +23,8 @@ class Student extends Authenticatable
         'class_id',
         'board_id',
         'photo',
+        'progress_report',
+        'monthly_fees',
         'joining_date',
         'slug',
         'is_active',
@@ -37,7 +39,7 @@ class Student extends Authenticatable
 
     public function classInfo()
     {
-        return $this->belongsTo(Classes::class, 'class_id');
+        return $this->belongsTo(Classes::class , 'class_id');
     }
     public function board()
     {
@@ -82,7 +84,7 @@ class Student extends Authenticatable
     public static function generateStudentId(): string
     {
         $now = now();
-        $month = (int) $now->format('n');
+        $month = (int)$now->format('n');
         // Academic year April–March (adjusted for India March start per flowchart)
         // If month >= 3 (March) the session is current year → next year
         $startYear = $month >= 3 ? $now->year : $now->year - 1;
@@ -92,7 +94,7 @@ class Student extends Authenticatable
 
         $last = static::where('student_id', 'like', $prefix . '%')
             ->orderByDesc('id')->first();
-        $seq = $last ? ((int) substr($last->student_id, -4)) + 1 : 1;
+        $seq = $last ? ((int)substr($last->student_id, -4)) + 1 : 1;
 
         return $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);
     }

@@ -42,9 +42,11 @@ class StudentController extends Controller
             'board_id' => 'required|exists:boards,id',
             'joining_date' => 'required|date',
             'photo' => 'nullable|image|max:2048',
+            'progress_report' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'monthly_fees' => 'required|numeric|min:0',
         ]);
 
-        $data = $request->only('name', 'email', 'mobile', 'dob', 'school_name', 'class_id', 'board_id', 'joining_date', 'is_active');
+        $data = $request->only('name', 'email', 'mobile', 'dob', 'school_name', 'class_id', 'board_id', 'joining_date', 'monthly_fees', 'is_active');
         $data['password'] = Hash::make($request->password);
         $data['student_id'] = Student::generateStudentId();
         $data['slug'] = Str::slug($request->name . '-' . uniqid());
@@ -56,6 +58,11 @@ class StudentController extends Controller
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('students/photos', 'public');
             $data['photo'] = $path;
+        }
+
+        if ($request->hasFile('progress_report')) {
+            $path = $request->file('progress_report')->store('students/progress_reports', 'public');
+            $data['progress_report'] = $path;
         }
 
         $student = Student::create($data);
@@ -101,15 +108,22 @@ class StudentController extends Controller
             'board_id' => 'required|exists:boards,id',
             'joining_date' => 'required|date',
             'photo' => 'nullable|image|max:2048',
+            'progress_report' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'monthly_fees' => 'required|numeric|min:0',
         ]);
 
-        $data = $request->only('name', 'email', 'mobile', 'dob', 'school_name', 'class_id', 'board_id', 'joining_date', 'is_active');
+        $data = $request->only('name', 'email', 'mobile', 'dob', 'school_name', 'class_id', 'board_id', 'joining_date', 'monthly_fees', 'is_active');
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('students/photos', 'public');
             $data['photo'] = $path;
+        }
+
+        if ($request->hasFile('progress_report')) {
+            $path = $request->file('progress_report')->store('students/progress_reports', 'public');
+            $data['progress_report'] = $path;
         }
         $student->update($data);
 
@@ -123,7 +137,8 @@ class StudentController extends Controller
         ];
         if ($student->parent) {
             $student->parent->update($parentData);
-        } else {
+        }
+        else {
             StudentParent::create(array_merge($parentData, [
                 'student_id' => $student->id,
                 'slug' => Str::slug('sp-' . uniqid()),
