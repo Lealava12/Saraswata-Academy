@@ -20,6 +20,7 @@
                         <th>#</th>
                         <th>Date</th>
                         <th>Class</th>
+                        <th>Board</th>  
                         <th>Subjects</th>
                         <th>Action</th>
                     </tr>
@@ -30,6 +31,7 @@
                         <td>{{ $i+1 }}</td>
                         <td>{{ $a->attendance_date->format('d-m-Y') }}</td>
                         <td>{{ $a->classInfo->name ?? '-' }}</td>
+                          <td>{{ $a->classInfo?->board?->name ?? '-' }}</td>
                         <td>
                             @foreach($a->subjects as $subject)
                                 <span class="badge bg-info">{{ $subject->name }}</span>

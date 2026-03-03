@@ -91,21 +91,31 @@
 <div class="card">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr><th>Date</th><th>Subject</th><th>Status</th></tr>
+            <table class="table table-hover table-bordered mb-0 align-middle">
+                <thead class="table-light text-center">
+                    <tr><th width="30%">Date</th><th width="40%">Subject</th><th width="30%">Status</th></tr>
                 </thead>
-                <tbody>
-                    @forelse($records as $r)
-                    <tr>
-                        <td>{{ optional(optional($r->attendance))->attendance_date ?? '-' }}</td>
-                        <td>{{ optional($r->attendance)->subjects?->pluck('name')->join(', ') ?: '-' }}</td>
-                        <td>
-                            <span class="badge {{ $r->status === 'Present' ? 'badge-present' : 'badge-absent' }} rounded-pill px-3">
-                                {{ $r->status }}
-                            </span>
-                        </td>
-                    </tr>
+                <tbody class="text-center">
+                    @php
+                        $groupedRecords = $records->groupBy(function($r) {
+                            $date = optional($r->attendance)->attendance_date;
+                            return $date ? \Carbon\Carbon::parse($date)->format('d M Y') : '-';
+                        });
+                    @endphp
+                    @forelse($groupedRecords as $date => $dateRecords)
+                        @foreach($dateRecords as $index => $r)
+                        <tr>
+                            @if($index === 0)
+                            <td rowspan="{{ $dateRecords->count() }}" class="fw-semibold bg-light">{{ $date }}</td>
+                            @endif
+                            <td>{{ $r->subject?->name ?? optional($r->attendance)->subjects?->pluck('name')->join(', ') ?: '-' }}</td>
+                            <td>
+                                <span class="badge {{ $r->status === 'Present' ? 'bg-success' : 'bg-danger' }} rounded-pill px-3">
+                                    {{ $r->status }}
+                                </span>
+                            </td>
+                        </tr>
+                        @endforeach
                     @empty
                     <tr><td colspan="3" class="text-center py-4 text-muted">No records found.</td></tr>
                     @endforelse

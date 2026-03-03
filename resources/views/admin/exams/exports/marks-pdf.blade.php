@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Exam Marks - {{ $exam->classInfo->name }} - {{ $exam->subject->name }}</title>
+    <title>Exam Marks - {{ $exam->classInfo->name }} {{ optional($exam->classInfo->board)->name ? '('.$exam->classInfo->board->name.')' : '' }} - {{ $exam->subject->name }}</title>
     <style>
         body {
             font-family: 'DejaVu Sans', sans-serif;
@@ -84,7 +84,7 @@
 <body>
     <div class="header">
         <h2>Exam Marks Report</h2>
-        <p>{{ $exam->classInfo->name ?? 'N/A' }} - {{ $exam->subject->name ?? 'N/A' }}</p>
+        <p>{{ $exam->classInfo->name ?? 'N/A' }} {{ optional($exam->classInfo->board)->name ? '('.$exam->classInfo->board->name.')' : '' }} - {{ $exam->subject->name ?? 'N/A' }}</p>
         <p>Exam Date: {{ \Carbon\Carbon::parse($exam->exam_date)->format('d F Y') }}</p>
     </div>
 

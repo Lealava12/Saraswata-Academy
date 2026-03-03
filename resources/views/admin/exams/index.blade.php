@@ -37,7 +37,7 @@
                     @foreach($exams as $i => $exam)
                     <tr>
                         <td>{{ $i+1 }}</td>
-                        <td>{{ $exam->classInfo->name ?? '-' }}</td>
+                        <td>{{ ($exam->classInfo->name ?? '-') . ($exam->classInfo->board->name ? ' (' . $exam->classInfo->board->name . ')' : '') }}</td>
                         <td>{{ $exam->subject->name ?? '-' }}</td>
                        <td>{{ $exam->exam_date?->format('d M Y') }}</td>
                         <td>{{ $exam->full_marks }}</td>

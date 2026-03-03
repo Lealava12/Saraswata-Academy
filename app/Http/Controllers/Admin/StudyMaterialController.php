@@ -15,14 +15,13 @@ class StudyMaterialController extends Controller
 {
    public function index()
 {
-    $materials = StudyMaterial::withCount(['studentMaterials' => function ($query) {
-            $query->where('status', 'Issued'); // Counts only "Issued" assignments
-        }])
-        ->whereHas('studentMaterials', function ($query) {
-            $query->where('status', 'Issued'); // Only shows materials that have at least one "Issued" assignment
-        })
-        ->latest()
-        ->get();
+    $materials = StudyMaterial::withCount([
+        'studentMaterials as issued_count' => function ($q) {
+            $q->where('status', 'Issued');
+        }
+    ])
+    ->latest()
+    ->get();
 
     return view('admin.study-materials.index', compact('materials'));
 }

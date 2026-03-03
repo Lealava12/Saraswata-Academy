@@ -16,6 +16,12 @@ class TeacherSalary extends Model
         'class_id',
         'slug',
         'is_active',
+        'breakdown',
+    ];
+
+    protected $casts = [
+        'breakdown' => 'array',
+        'payment_date' => 'date',
     ];
 
     public function teacher()

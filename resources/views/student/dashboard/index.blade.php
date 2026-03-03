@@ -18,7 +18,7 @@
             </div>
             <div class="vr opacity-25 d-none d-md-block"></div>
             <div>
-                <div class="fw-semibold">{{ $student->board->name ?? '-' }}</div>
+               <div class="fw-semibold">{{ $student->board?->name ?? '-' }}</div>
                 <div class="opacity-75 small">Board</div>
             </div>
             <div class="vr opacity-25 d-none d-md-block"></div>
@@ -29,12 +29,23 @@
         </div>
     </div>
 
-    <!-- Alert: Overdue -->
-    @if ($overdueCount > 0)
-        <div class="alert alert-danger d-flex align-items-center gap-2 mb-4">
-            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
-            <div>You have <strong>{{ $overdueCount }}</strong> overdue fee(s). <a href="{{ route('student.fees') }}"
-                    class="alert-link">View details</a></div>
+    <!-- Alert: Overdue (> 10 Days) -->
+    @if (isset($isOverdue) && $isOverdue)
+        <div class="alert alert-danger d-flex align-items-center gap-3 mb-4 shadow-sm border-0" style="border-left: 5px solid #dc3545 !important;">
+            <i class="bi bi-exclamation-octagon-fill fs-3 text-danger"></i>
+            <div>
+                <h6 class="alert-heading fw-bold mb-1 text-danger">Action Required: Late Fee Payment</h6>
+                <p class="mb-0 small">Your monthly fees are overdue by more than 10 days. Current outstanding balance is <strong>₹{{ number_format($balanceDue ?? 0, 2) }}</strong>. Please clear your dues at the earliest.</p>
+            </div>
+            <a href="{{ route('student.fees') }}" class="btn btn-danger btn-sm ms-auto">Pay Now</a>
+        </div>
+    @elseif(isset($balanceDue) && $balanceDue > 0)
+        <div class="alert alert-warning d-flex align-items-center gap-3 mb-4 shadow-sm border-0" style="border-left: 5px solid #ffc107 !important;">
+            <i class="bi bi-clock-fill fs-3 text-warning"></i>
+            <div>
+                <h6 class="alert-heading fw-bold mb-1 text-warning">Upcoming Fee Due</h6>
+                <p class="mb-0 small">You have a pending balance of <strong>₹{{ number_format($balanceDue, 2) }}</strong>. Please ensure timely payment to avoid late charges.</p>
+            </div>
         </div>
     @endif
 

@@ -7,7 +7,7 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <span>
             <i class="bi bi-journal-text me-2"></i>
-            Marks – {{ $exam->classInfo->name ?? '' }} / {{ $exam->subject->name ?? '' }} – {{ $exam->exam_date }}
+            Marks – {{ $exam->classInfo->name ?? '' }} {{ optional($exam->classInfo->board)->name ? '('.$exam->classInfo->board->name.')' : '' }} / {{ $exam->subject->name ?? '' }} – {{ $exam->exam_date }}
             <span class="text-muted small">(Full: {{ $exam->full_marks }})</span>
         </span>
         <a href="{{ route('admin.exams.index') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>

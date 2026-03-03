@@ -25,11 +25,11 @@
                         value="{{ old('mobile') }}" 
                         oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);" 
                         required>                </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label fw-medium">Joining Date <span class="text-danger">*</span></label>
                     <input type="date" name="joining_date" class="form-control" value="{{ old('joining_date', date('Y-m-d')) }}" required>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label fw-medium">Address</label>
                     <input type="text" name="address" class="form-control" value="{{ old('address') }}">
                 </div>

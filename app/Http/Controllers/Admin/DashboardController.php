@@ -26,10 +26,22 @@ class DashboardController extends Controller
             ->whereMonth('payment_date', now()->month)
             ->sum('amount');
 
-        $feeDue = StudentFee::where('status', 'Due')->sum('amount');
-        $feeOverdue = StudentFee::where('status', 'Overdue')->sum('amount');
-        $overdueCount = StudentFee::where('status', 'Overdue')->count();
+       $feeDue = 0;
+$feeOverdue = 0;
+$overdueCount = 0;
 
+$students = Student::where('is_active', 1)->with('fees')->get();
+
+foreach ($students as $s) {
+    $balance = $s->getBalanceDue();  // you already use this in pending page
+    if ($balance > 0) {
+        $feeDue += $balance;
+        if ($s->getOverdueStatus()) {
+            $feeOverdue += $balance;
+            $overdueCount++;
+        }
+    }
+}
         // Monthly fee income vs expenses
         $totalExpenditure = Expenditure::whereYear('expense_date', now()->year)
             ->whereMonth('expense_date', now()->month)
@@ -54,6 +66,12 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Late payment alerts (> 10 days overdue)
+        $latePaymentAlerts = Student::where('is_active', 1)
+            ->get()
+            ->filter(fn($s) => $s->getOverdueStatus())
+            ->take(5);
+
         return view('admin.dashboard.index', compact(
             'totalStudents',
             'totalTeachers',
@@ -66,7 +84,8 @@ class DashboardController extends Controller
             'teacherPaid',
             'staffPaid',
             'recentStudents',
-            'overdueStudents'
+            'overdueStudents',
+            'latePaymentAlerts'
         ));
     }
 }

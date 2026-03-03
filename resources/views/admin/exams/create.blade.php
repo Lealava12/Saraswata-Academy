@@ -17,7 +17,7 @@
                     <select name="class_id" class="form-select" required>
                         <option value="">-- Select Class --</option>
                         @foreach($classes as $c)
-                        <option value="{{ $c->id }}" {{ old('class_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                        <option value="{{ $c->id }}" {{ old('class_id') == $c->id ? 'selected' : '' }}>{{ $c->name }} {{ $c->board ? ' ('. $c->board->name .')' : '' }}</option>
                         @endforeach
                     </select>
                 </div>

@@ -10,6 +10,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+<link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+<link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
     <!-- DataTables -->
     <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -335,9 +338,13 @@
 
     <!-- Sidebar -->
     <nav id="sidebar">
-        <div class="sidebar-brand">
-            <h5><i class="bi bi-mortarboard-fill me-2" style="color: #6366f1"></i>Saraswata</h5>
-            <small>Academy Admin Panel</small>
+        <div class="sidebar-brand text-center py-3">
+            <a href="{{ route('admin.dashboard') }}">
+                <img src="{{ asset('logo.jpg') }}"
+                    alt="Saraswata Academy"
+                    style="max-height:60px;"
+                    class="img-fluid">
+            </a>
         </div>
         <div class="sidebar-nav">
             <div class="nav-label">Main</div>
@@ -370,11 +377,11 @@
                 <i class="bi bi-people-fill"></i> Students
             </a>
             <a href="{{ route('admin.teachers.index') }}"
-                class="nav-link {{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}">
+                class="nav-link {{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}" data-mpin-gate="true">
                 <i class="bi bi-person-badge-fill"></i> Teachers
             </a>
             <a href="{{ route('admin.staff.index') }}"
-                class="nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}">
+                class="nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}" data-mpin-gate="true">
                 <i class="bi bi-person-gear"></i> Staffs
             </a>
             <a href="{{ route('admin.attendance.index') }}"
@@ -392,15 +399,15 @@
 
             <div class="nav-label">Finance</div>
             <a href="{{ route('admin.fees.index') }}"
-                class="nav-link {{ request()->routeIs('admin.fees.*') ? 'active' : '' }}">
+                class="nav-link {{ request()->routeIs('admin.fees.*') ? 'active' : '' }}" data-mpin-gate="true">
                 <i class="bi bi-cash-coin"></i> Student Fees
             </a>
             <a href="{{ route('admin.teacher-salary.index') }}"
-                class="nav-link {{ request()->routeIs('admin.teacher-salary.*') ? 'active' : '' }}">
+                class="nav-link {{ request()->routeIs('admin.teacher-salary.*') ? 'active' : '' }}" data-mpin-gate="true">
                 <i class="bi bi-wallet2"></i> Teacher Salary
             </a>
             <a href="{{ route('admin.staff-salary.index') }}"
-                class="nav-link {{ request()->routeIs('admin.staff-salary.*') ? 'active' : '' }}">
+                class="nav-link {{ request()->routeIs('admin.staff-salary.*') ? 'active' : '' }}" data-mpin-gate="true">
                 <i class="bi bi-wallet-fill"></i> Staff Salary
             </a>
             <a href="{{ route('admin.expenditures.index') }}"
@@ -428,6 +435,10 @@
             </a>
 
 
+            <div class="nav-label">Settings</div>
+            <a href="{{ route('admin.manage-mpin') }}" class="nav-link {{ request()->routeIs('admin.manage-mpin*') ? 'active' : '' }}">
+                <i class="bi bi-shield-lock-fill"></i> Manage MPIN
+            </a>
         </div>
     </nav>
 
@@ -509,14 +520,22 @@
     <script>
         // Auto-init DataTables on all .data-table elements
         $(document).ready(function() {
-            $('.data-table').DataTable({
-                responsive: true,
-                pageLength: 25,
-                language: {
-                    search: '',
-                    searchPlaceholder: 'Search...',
-                    emptyTable: 'No records found'
+            $('.data-table, .datatable').each(function () {
+                if ($.fn.DataTable.isDataTable(this)) {
+                    $(this).DataTable().destroy();
                 }
+
+                $(this).DataTable({
+                    responsive: true,
+                    autoWidth: false,
+                    pageLength: 25,
+                    language: {
+                        search: '',
+                        searchPlaceholder: 'Search...',
+                        emptyTable: 'No records found.',
+                        zeroRecords: 'No matching records found.'
+                    }
+                });
             });
 
             // Sidebar Toggle Control
@@ -557,6 +576,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+        
     </script>
     @stack('scripts')
 </body>

@@ -54,7 +54,7 @@ class StaffSalaryController extends Controller
 
     public function verifyMpin(Request $request)
     {
-        if ($request->mpin === env('ADMIN_SALARY_MPIN')) {
+        if ($request->mpin === config('app.admin_salary_mpin')) {
             session(['mpin_unlocked' => true]);
             return response()->json(['success' => true]);
         }

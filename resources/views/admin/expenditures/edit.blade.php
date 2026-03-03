@@ -28,13 +28,7 @@
                     <label class="form-label fw-medium">Description</label>
                     <textarea name="description" class="form-control" rows="3">{{ old('description', $expenditure->description) }}</textarea>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-medium">Status</label>
-                    <select name="is_active" class="form-select">
-                        <option value="1" {{ $expenditure->is_active ? 'selected' : '' }}>Active</option>
-                        <option value="0" {{ !$expenditure->is_active ? 'selected' : '' }}>Inactive</option>
-                    </select>
-                </div>
+              <input type="hidden" name="is_active" value="1">
                 <div class="col-12 mt-2">
                     <button type="submit" class="btn btn-accent px-4"><i class="bi bi-check-lg me-2"></i>Update</button>
                     <a href="{{ route('admin.expenditures.index') }}" class="btn btn-light ms-2">Cancel</a>

@@ -25,35 +25,36 @@ class ReportController extends Controller
     {
         $classes = Classes::where('is_active', 1)->get();
         $subjects = Subject::where('is_active', 1)->get();
-        
+
         // Get students for dropdown - based on class if selected
         $students = Student::where('is_active', 1)
-            ->when($request->class_id, function($q) use ($request) {
-                return $q->where('class_id', $request->class_id);
-            })
+            ->when($request->class_id, function ($q) use ($request) {
+            return $q->where('class_id', $request->class_id);
+        })
             ->orderBy('name')
             ->get(['id', 'name', 'student_id', 'roll_no']);
-        
+
         // Build the query
         $query = Attendance::with(['classInfo', 'subjects', 'details.student'])
-            ->when($request->class_id, function($q) use ($request) {
-                return $q->where('class_id', $request->class_id);
-            })
-            ->when($request->subject_id, function($q) use ($request) {
-                return $q->whereHas('subjects', function($subQuery) use ($request) {
+            ->when($request->class_id, function ($q) use ($request) {
+            return $q->where('class_id', $request->class_id);
+        })
+            ->when($request->subject_id, function ($q) use ($request) {
+            return $q->whereHas('subjects', function ($subQuery) use ($request) {
                     $subQuery->where('subject_id', $request->subject_id);
-                });
+                }
+                );
             })
-            ->when($request->from_date, function($q) use ($request) {
-                return $q->whereDate('attendance_date', '>=', Carbon::parse($request->from_date)->format('Y-m-d'));
-            })
-            ->when($request->to_date, function($q) use ($request) {
-                return $q->whereDate('attendance_date', '<=', Carbon::parse($request->to_date)->format('Y-m-d'));
-            });
+            ->when($request->from_date, function ($q) use ($request) {
+            return $q->whereDate('attendance_date', '>=', Carbon::parse($request->from_date)->format('Y-m-d'));
+        })
+            ->when($request->to_date, function ($q) use ($request) {
+            return $q->whereDate('attendance_date', '<=', Carbon::parse($request->to_date)->format('Y-m-d'));
+        });
 
         // Get attendances
         $attendances = $query->orderBy('attendance_date', 'desc')->get();
-        
+
         // If student is selected, filter the attendances to only show those where the student exists
         $filteredAttendances = collect();
         if ($request->filled('student_id')) {
@@ -73,27 +74,29 @@ class ReportController extends Controller
             }
             $attendances = $filteredAttendances;
         }
-        
+
         // Calculate overall statistics
         $totalPresent = 0;
         $totalAbsent = 0;
         $totalRecords = 0;
-        
+
         foreach ($attendances as $attendance) {
             if ($request->filled('student_id')) {
                 // For student-specific view, each attendance record has only one detail
                 if (isset($attendance->student_detail)) {
                     if ($attendance->student_detail->status === 'Present') {
                         $totalPresent++;
-                    } else {
+                    }
+                    else {
                         $totalAbsent++;
                     }
                     $totalRecords++;
                 }
-            } else {
+            }
+            else {
                 $present = $attendance->details->where('status', 'Present')->count();
                 $absent = $attendance->details->where('status', 'Absent')->count();
-                
+
                 $totalPresent += $present;
                 $totalAbsent += $absent;
                 $totalRecords += $attendance->details->count();
@@ -104,31 +107,33 @@ class ReportController extends Controller
         $chartLabels = [];
         $chartPresent = [];
         $chartAbsent = [];
-        
+
         foreach ($attendances as $attendance) {
             $chartLabels[] = $attendance->attendance_date->format('d M Y');
-            
+
             if ($request->filled('student_id') && isset($attendance->student_detail)) {
                 if ($attendance->student_detail->status === 'Present') {
                     $chartPresent[] = 1;
                     $chartAbsent[] = 0;
-                } else {
+                }
+                else {
                     $chartPresent[] = 0;
                     $chartAbsent[] = 1;
                 }
-            } else {
+            }
+            else {
                 $chartPresent[] = $attendance->details->where('status', 'Present')->count();
                 $chartAbsent[] = $attendance->details->where('status', 'Absent')->count();
             }
         }
 
         return view('admin.reports.attendance', compact(
-            'classes', 
-            'subjects', 
+            'classes',
+            'subjects',
             'students',
-            'attendances', 
-            'totalPresent', 
-            'totalAbsent', 
+            'attendances',
+            'totalPresent',
+            'totalAbsent',
             'totalRecords',
             'chartLabels',
             'chartPresent',
@@ -142,7 +147,7 @@ class ReportController extends Controller
             ->where('is_active', 1)
             ->orderBy('roll_no')
             ->get(['id', 'name', 'student_id', 'roll_no']);
-        
+
         return response()->json($students);
     }
 
@@ -150,27 +155,28 @@ class ReportController extends Controller
     {
         // Build the query
         $query = Attendance::with(['classInfo', 'subjects', 'details.student'])
-            ->when($request->class_id, function($q) use ($request) {
-                return $q->where('class_id', $request->class_id);
-            })
-            ->when($request->subject_id, function($q) use ($request) {
-                return $q->whereHas('subjects', function($subQuery) use ($request) {
+            ->when($request->class_id, function ($q) use ($request) {
+            return $q->where('class_id', $request->class_id);
+        })
+            ->when($request->subject_id, function ($q) use ($request) {
+            return $q->whereHas('subjects', function ($subQuery) use ($request) {
                     $subQuery->where('subject_id', $request->subject_id);
-                });
+                }
+                );
             })
-            ->when($request->from_date, function($q) use ($request) {
-                return $q->whereDate('attendance_date', '>=', Carbon::parse($request->from_date)->format('Y-m-d'));
-            })
-            ->when($request->to_date, function($q) use ($request) {
-                return $q->whereDate('attendance_date', '<=', Carbon::parse($request->to_date)->format('Y-m-d'));
-            })
+            ->when($request->from_date, function ($q) use ($request) {
+            return $q->whereDate('attendance_date', '>=', Carbon::parse($request->from_date)->format('Y-m-d'));
+        })
+            ->when($request->to_date, function ($q) use ($request) {
+            return $q->whereDate('attendance_date', '<=', Carbon::parse($request->to_date)->format('Y-m-d'));
+        })
             ->orderBy('attendance_date', 'desc');
 
         $attendances = $query->get();
 
         // Set headers for CSV download
         $filename = 'attendance_report_' . date('Y-m-d_His') . '.csv';
-        
+
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
@@ -179,28 +185,28 @@ class ReportController extends Controller
             'Expires' => '0'
         ];
 
-        $callback = function() use ($attendances, $request) {
+        $callback = function () use ($attendances, $request) {
             $handle = fopen('php://output', 'w');
-            
+
             // Add UTF-8 BOM for Excel to handle special characters and dates properly
-            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
-            
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
             // Add headers
             fputcsv($handle, [
-                'Date', 
-                'Class', 
-                'Subjects', 
-                'Student ID', 
-                'Student Name', 
-                'Roll No', 
+                'Date',
+                'Class',
+                'Subjects',
+                'Student ID',
+                'Student Name',
+                'Roll No',
                 'Status'
             ]);
-            
+
             // Add data
             foreach ($attendances as $attendance) {
                 $subjects = $attendance->subjects->pluck('name')->implode(', ');
                 $date = $attendance->attendance_date ? $attendance->attendance_date->format('d-m-Y') : '';
-                
+
                 // If specific student is selected, only export that student's data
                 if ($request->filled('student_id')) {
                     $detail = $attendance->details->where('student_id', $request->student_id)->first();
@@ -215,7 +221,8 @@ class ReportController extends Controller
                             $detail->status
                         ]);
                     }
-                } else {
+                }
+                else {
                     // Export all students
                     foreach ($attendance->details as $detail) {
                         fputcsv($handle, [
@@ -230,7 +237,7 @@ class ReportController extends Controller
                     }
                 }
             }
-            
+
             fclose($handle);
         };
 
@@ -241,20 +248,21 @@ class ReportController extends Controller
     {
         // Build the query
         $attendances = Attendance::with(['classInfo', 'subjects', 'details.student'])
-            ->when($request->class_id, function($q) use ($request) {
-                return $q->where('class_id', $request->class_id);
-            })
-            ->when($request->subject_id, function($q) use ($request) {
-                return $q->whereHas('subjects', function($subQuery) use ($request) {
+            ->when($request->class_id, function ($q) use ($request) {
+            return $q->where('class_id', $request->class_id);
+        })
+            ->when($request->subject_id, function ($q) use ($request) {
+            return $q->whereHas('subjects', function ($subQuery) use ($request) {
                     $subQuery->where('subject_id', $request->subject_id);
-                });
+                }
+                );
             })
-            ->when($request->from_date, function($q) use ($request) {
-                return $q->whereDate('attendance_date', '>=', Carbon::parse($request->from_date)->format('Y-m-d'));
-            })
-            ->when($request->to_date, function($q) use ($request) {
-                return $q->whereDate('attendance_date', '<=', Carbon::parse($request->to_date)->format('Y-m-d'));
-            })
+            ->when($request->from_date, function ($q) use ($request) {
+            return $q->whereDate('attendance_date', '>=', Carbon::parse($request->from_date)->format('Y-m-d'));
+        })
+            ->when($request->to_date, function ($q) use ($request) {
+            return $q->whereDate('attendance_date', '<=', Carbon::parse($request->to_date)->format('Y-m-d'));
+        })
             ->orderBy('attendance_date', 'desc')
             ->get();
 
@@ -283,9 +291,12 @@ class ReportController extends Controller
 
     public function exam(Request $request)
     {
-        $classes = Classes::get();
-        $subjects = Subject::get();
-        $students = Student::get();
+        $classes = Classes::where('is_active', 1)->get();
+        $subjects = Subject::where('is_active', 1)->get();
+        $students = Student::where('is_active', 1)
+            ->when($request->class_id, function ($q) use ($request) {
+            return $q->where('class_id', $request->class_id);
+        })->orderBy('name')->get();
 
         $query = ExamMark::with(['exam.classInfo', 'exam.subject', 'student'])
             ->whereHas('exam', fn($q) => $q);
@@ -304,7 +315,79 @@ class ReportController extends Controller
         }
 
         $marks = $query->latest()->get();
-        return view('admin.reports.exam', compact('marks', 'classes', 'subjects', 'students'));
+
+        // 1. Weekly Trends
+        $weeklySummary = $marks->groupBy(function ($mark) {
+            return Carbon::parse($mark->exam->exam_date)->startOfWeek()->format('d M Y');
+        })->map(function ($weekMarks) {
+            return [
+            'avg_pct' => $weekMarks->avg(function ($m) {
+                    $full = $m->exam->full_marks ?? 0;
+                    return $full > 0 ? ($m->marks_obtained / $full) * 100 : 0;
+                }
+                ),
+                'count' => $weekMarks->count()
+                ];
+            })->sortKeysDesc();
+
+        // 2. Student Performance Ranking
+        $studentPerformance = $marks->groupBy('student_id')->map(function ($studentMarks) {
+            $firstMark = $studentMarks->first();
+            return [
+            'name' => $firstMark->student->name ?? 'Unknown',
+            'student_id' => $firstMark->student->student_id ?? '-',
+            'roll_no' => $firstMark->student->roll_no ?? '-',
+            'exams_taken' => $studentMarks->count(),
+            'avg_pct' => $studentMarks->avg(function ($m) {
+                    $full = $m->exam->full_marks ?? 0;
+                    return $full > 0 ? ($m->marks_obtained / $full) * 100 : 0;
+                }
+                ),
+                'highest_pct' => $studentMarks->max(function ($m) {
+                    $full = $m->exam->full_marks ?? 0;
+                    return $full > 0 ? ($m->marks_obtained / $full) * 100 : 100; // avoid max empty
+                }
+                )
+                ];
+            })->sortByDesc('avg_pct');
+
+        // 3. Subject Summary
+        $subjectStats = $marks->groupBy(fn($m) => $m->exam->subject_id)->map(function ($subjectMarks) {
+            $firstMark = $subjectMarks->first();
+            return [
+            'name' => $firstMark->exam->subject->name ?? 'Unknown',
+            'avg_pct' => $subjectMarks->avg(function ($m) {
+                    $full = $m->exam->full_marks ?? 0;
+                    return $full > 0 ? ($m->marks_obtained / $full) * 100 : 0;
+                }
+                ),
+                'total_exams' => $subjectMarks->count(),
+                'pass_count' => $subjectMarks->filter(function ($m) {
+                    $full = $m->exam->full_marks ?? 0;
+                    return $full > 0 && ($m->marks_obtained / $full) >= 0.35; // Basic pass threshold
+                }
+                )->count()
+                ];
+            })->sortByDesc('avg_pct');
+
+        // 4. Monthly Academic Summary
+        $monthlySummary = $marks->groupBy(function ($mark) {
+            return Carbon::parse($mark->exam->exam_date)->format('F Y');
+        })->map(function ($monthMarks) {
+            return [
+            'avg_pct' => $monthMarks->avg(function ($m) {
+                    $full = $m->exam->full_marks ?? 0;
+                    return $full > 0 ? ($m->marks_obtained / $full) * 100 : 0;
+                }
+                ),
+                'total_entries' => $monthMarks->count()
+                ];
+            });
+
+        return view('admin.reports.exam', compact(
+            'marks', 'classes', 'subjects', 'students',
+            'weeklySummary', 'studentPerformance', 'subjectStats', 'monthlySummary'
+        ));
     }
 
     public function fee(Request $request)
@@ -327,12 +410,95 @@ class ReportController extends Controller
         }
 
         $fees = $query->latest()->get();
-        $totalPaid = (clone $query)->where('status', 'Paid')->sum('amount');
-        $totalDue = (clone $query)->where('status', 'Due')->sum('amount');
-        $totalOverdue = (clone $query)->where('status', 'Overdue')->sum('amount');
-        return view('admin.reports.fee', compact('fees', 'classes', 'students', 'totalPaid', 'totalDue', 'totalOverdue'));
-    }
 
+        // Global Analytics (All active students)
+        $allActiveStudents = Student::where('is_active', 1)->with('fees')->get();
+        $totalRevenue = 0;
+        $totalCollected = 0;
+        $globalOverdueCount = 0;
+        $globalOverdueAmount = 0;
+
+        foreach ($allActiveStudents as $student) {
+            $expected = $student->getExpectedFeesTillToday();
+            $paid = $student->getTotalPaidFees();
+            $balance = max(0, $expected - $paid);
+
+            $totalRevenue += $expected;
+            $totalCollected += $paid;
+
+            if ($student->getOverdueStatus()) {
+                $globalOverdueCount++;
+                $globalOverdueAmount += $balance;
+            }
+        }
+
+        $totalPending = max(0, $totalRevenue - $totalCollected);
+
+        return view('admin.reports.fee', compact(
+            'fees', 'classes', 'students',
+            'totalCollected', 'totalRevenue', 'totalPending',
+            'globalOverdueCount', 'globalOverdueAmount'
+        ));
+    }
+private function filteredMarksQuery(Request $request)
+{
+    return ExamMark::query()
+        ->with(['student', 'exam.classInfo', 'exam.subject'])
+        ->when($request->class_id, function ($q) use ($request) {
+            $q->whereHas('exam', fn($ex) => $ex->where('class_id', $request->class_id));
+        })
+        ->when($request->subject_id, function ($q) use ($request) {
+            $q->whereHas('exam', fn($ex) => $ex->where('subject_id', $request->subject_id));
+        })
+        ->when($request->from_date, function ($q) use ($request) {
+            $q->whereHas('exam', fn($ex) => $ex->whereDate('exam_date', '>=', $request->from_date));
+        })
+        ->when($request->to_date, function ($q) use ($request) {
+            $q->whereHas('exam', fn($ex) => $ex->whereDate('exam_date', '<=', $request->to_date));
+        });
+}
+public function exportExamPdf(Request $request)
+{
+    $marks = $this->filteredMarksQuery($request)->latest()->get();
+
+    $pdf = Pdf::loadView('admin.reports.pdf.exam', compact('marks'));
+
+    return $pdf->download('exam_report_' . now()->format('Y-m-d') . '.pdf');
+}
+public function exportExamCsv(Request $request)
+{
+    $marks = $this->filteredMarksQuery($request)->latest()->get();
+
+    $filename = 'exam_report_' . now()->format('Y-m-d') . '.csv';
+
+    return response()->stream(function () use ($marks) {
+        $out = fopen('php://output', 'w');
+
+        fputcsv($out, ['Date', 'Class', 'Subject', 'Student', 'Marks', 'Full Marks', '%', 'Grade']);
+
+        foreach ($marks as $m) {
+            $full = $m->exam->full_marks ?? 0;
+            $pct = $full > 0 ? round(($m->marks_obtained / $full) * 100, 1) : 0;
+            $grade = $pct>=90?'A+':($pct>=75?'A':($pct>=60?'B':($pct>=45?'C':'F')));
+
+            fputcsv($out, [
+                $m->exam?->exam_date,
+                $m->exam?->classInfo?->name ?? '-',
+                $m->exam?->subject?->name ?? '-',
+                $m->student?->name ?? '-',
+                $m->marks_obtained,
+                $full,
+                $pct,
+                $grade,
+            ]);
+        }
+
+        fclose($out);
+    }, 200, [
+        'Content-Type' => 'text/csv',
+        'Content-Disposition' => "attachment; filename=\"$filename\"",
+    ]);
+}
     public function financial(Request $request)
     {
         $year = $request->year ?? now()->year;
@@ -366,13 +532,16 @@ class ReportController extends Controller
         if ($type === 'fee') {
             $data['records'] = StudentFee::with(['student', 'classInfo'])->latest()->get();
             $pdf = Pdf::loadView('admin.reports.pdf.fee', $data)->setPaper('a4', 'landscape');
-        } elseif ($type === 'attendance') {
+        }
+        elseif ($type === 'attendance') {
             $data['records'] = AttendanceDetail::with(['attendance.classInfo', 'attendance.subjects', 'student'])->latest()->take(200)->get();
             $pdf = Pdf::loadView('admin.reports.pdf.attendance', $data)->setPaper('a4', 'landscape');
-        } elseif ($type === 'exam') {
+        }
+        elseif ($type === 'exam') {
             $data['records'] = ExamMark::with(['exam.classInfo', 'exam.subject', 'student'])->latest()->take(200)->get();
             $pdf = Pdf::loadView('admin.reports.pdf.exam', $data)->setPaper('a4', 'landscape');
-        } else {
+        }
+        else {
             abort(404);
         }
 
@@ -392,58 +561,63 @@ class ReportController extends Controller
         $callback = function () use ($type) {
             $out = fopen('php://output', 'w');
             // Add UTF-8 BOM for Excel
-            fprintf($out, chr(0xEF).chr(0xBB).chr(0xBF));
-            
+            fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
             if ($type === 'fee') {
                 fputcsv($out, ['Receipt No', 'Student', 'Student ID', 'Class', 'Amount', 'Payment Date', 'Payment Mode', 'Due Date', 'Status']);
                 StudentFee::with(['student', 'classInfo'])->chunk(200, function ($fees) use ($out) {
-                    foreach ($fees as $fee) {
-                        fputcsv($out, [
-                            $fee->receipt_no,
-                            $fee->student->name ?? '-',
-                            $fee->student->student_id ?? '-',
-                            $fee->classInfo->name ?? '-',
-                            $fee->amount,
-                            $fee->payment_date ? date('d-m-Y', strtotime($fee->payment_date)) : '-',
-                            $fee->payment_mode,
-                            $fee->due_date ? date('d-m-Y', strtotime($fee->due_date)) : '-',
-                            $fee->status,
-                        ]);
+                            foreach ($fees as $fee) {
+                                fputcsv($out, [
+                                    $fee->receipt_no,
+                                    $fee->student->name ?? '-',
+                                    $fee->student->student_id ?? '-',
+                                    $fee->classInfo->name ?? '-',
+                                    $fee->amount,
+                                    $fee->payment_date ? date('d-m-Y', strtotime($fee->payment_date)) : '-',
+                                    $fee->payment_mode,
+                                    $fee->due_date ? date('d-m-Y', strtotime($fee->due_date)) : '-',
+                                    $fee->status,
+                                ]);
+                            }
+                        }
+                        );
                     }
-                });
-            } elseif ($type === 'attendance') {
-                fputcsv($out, ['Date', 'Class', 'Subject', 'Student', 'Roll No', 'Status']);
-                AttendanceDetail::with(['attendance.classInfo', 'attendance.subjects', 'student'])->chunk(500, function ($rows) use ($out) {
-                    foreach ($rows as $r) {
-                        $subjects = $r->attendance->subjects->pluck('name')->implode(', ');
-                        fputcsv($out, [
-                            $r->attendance->attendance_date ? date('d-m-Y', strtotime($r->attendance->attendance_date)) : '-',
-                            optional(optional($r->attendance)->classInfo)->name ?? '-',
-                            $subjects,
-                            optional($r->student)->name ?? '-',
-                            optional($r->student)->roll_no ?? '-',
-                            $r->status,
-                        ]);
+                    elseif ($type === 'attendance') {
+                        fputcsv($out, ['Date', 'Class', 'Subject', 'Student', 'Roll No', 'Status']);
+                        AttendanceDetail::with(['attendance.classInfo', 'attendance.subjects', 'student'])->chunk(500, function ($rows) use ($out) {
+                            foreach ($rows as $r) {
+                                $subjects = $r->attendance->subjects->pluck('name')->implode(', ');
+                                fputcsv($out, [
+                                    $r->attendance->attendance_date ? date('d-m-Y', strtotime($r->attendance->attendance_date)) : '-',
+                                    optional(optional($r->attendance)->classInfo)->name ?? '-',
+                                    $subjects,
+                                    optional($r->student)->name ?? '-',
+                                    optional($r->student)->roll_no ?? '-',
+                                    $r->status,
+                                ]);
+                            }
+                        }
+                        );
                     }
-                });
-            } elseif ($type === 'exam') {
-                fputcsv($out, ['Date', 'Class', 'Subject', 'Full Marks', 'Student', 'Roll No', 'Marks Obtained']);
-                ExamMark::with(['exam.classInfo', 'exam.subject', 'student'])->chunk(500, function ($rows) use ($out) {
-                    foreach ($rows as $r) {
-                        fputcsv($out, [
-                            optional($r->exam)->exam_date ? date('d-m-Y', strtotime($r->exam->exam_date)) : '-',
-                            optional(optional($r->exam)->classInfo)->name ?? '-',
-                            optional(optional($r->exam)->subject)->name ?? '-',
-                            optional($r->exam)->full_marks ?? '-',
-                            optional($r->student)->name ?? '-',
-                            optional($r->student)->roll_no ?? '-',
-                            $r->marks_obtained,
-                        ]);
+                    elseif ($type === 'exam') {
+                        fputcsv($out, ['Date', 'Class', 'Subject', 'Full Marks', 'Student', 'Roll No', 'Marks Obtained']);
+                        ExamMark::with(['exam.classInfo', 'exam.subject', 'student'])->chunk(500, function ($rows) use ($out) {
+                            foreach ($rows as $r) {
+                                fputcsv($out, [
+                                    optional($r->exam)->exam_date ? date('d-m-Y', strtotime($r->exam->exam_date)) : '-',
+                                    optional(optional($r->exam)->classInfo)->name ?? '-',
+                                    optional(optional($r->exam)->subject)->name ?? '-',
+                                    optional($r->exam)->full_marks ?? '-',
+                                    optional($r->student)->name ?? '-',
+                                    optional($r->student)->roll_no ?? '-',
+                                    $r->marks_obtained,
+                                ]);
+                            }
+                        }
+                        );
                     }
-                });
-            }
-            fclose($out);
-        };
+                    fclose($out);
+                };
 
         return response()->stream($callback, 200, $headers);
     }

@@ -48,7 +48,7 @@ class StaffController extends Controller
     }
 
     public function edit(Staff $staff)
-    { 
+    {
         return view('admin.staff.edit', compact('staff'));
     }
 
@@ -72,5 +72,14 @@ class StaffController extends Controller
     {
         $staff->delete();
         return redirect()->route('admin.staff.index')->with('success', 'Staff removed.');
+    }
+
+    public function verifyMpin(Request $request)
+    {
+        if ($request->mpin === config('app.admin_salary_mpin')) {
+            session(['mpin_unlocked' => true]);
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'Invalid MPIN']);
     }
 }

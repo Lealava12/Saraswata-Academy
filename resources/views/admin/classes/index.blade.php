@@ -23,10 +23,10 @@
                         <td>
                             <div class="d-flex gap-1">
                                 <a href="{{ route('admin.classes.edit', $c->id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
-                                <form method="POST" action="{{ route('admin.classes.destroy', $c->id) }}" class="d-inline" onsubmit="return confirm('Remove?')">
+                                <!-- <form method="POST" action="{{ route('admin.classes.destroy', $c->id) }}" class="d-inline" onsubmit="return confirm('Remove?')">
                                     @csrf @method('DELETE')
                                     <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                </form>
+                                </form> -->
                             </div>
                         </td>
                     </tr>

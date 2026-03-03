@@ -40,9 +40,9 @@ class DashboardController extends Controller
             ->latest()
             ->first();
 
-        // Overdue alert
-        $overdueCount = StudentFee::where('student_id', $student->id)
-            ->where('status', 'Overdue')->count();
+        // Overdue status (> 10 days)
+        $isOverdue = $student->getOverdueStatus();
+        $balanceDue = $student->getBalanceDue();
 
         return view('student.dashboard.index', compact(
             'student',
@@ -50,7 +50,8 @@ class DashboardController extends Controller
             'nextFee',
             'lastExam',
             'latestMaterial',
-            'overdueCount'
+            'isOverdue',
+            'balanceDue'
         ));
     }
 }

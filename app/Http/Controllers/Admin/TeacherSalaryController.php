@@ -22,7 +22,10 @@ class TeacherSalaryController extends Controller
             return redirect()->route('admin.teacher-salary.index')->with('error', 'Authentication required.');
         }
         session()->forget('mpin_unlocked'); // Force re-auth for next enter
-        $teachers = Teacher::where('is_active', 1)->with('classes')->get();
+        // $teachers = Teacher::where('is_active', 1)->with('classes')->get();
+        $teachers = Teacher::where('is_active', 1)
+            ->with(['classes.board:id,name']) // load board with class
+            ->get();
         return view('admin.teacher-salary.create', compact('teachers'));
     }
 
@@ -36,15 +39,16 @@ class TeacherSalaryController extends Controller
             'class_count' => 'nullable|integer|min:0',
         ]);
 
-        
+
         TeacherSalary::create([
-    'teacher_id'   => $request->teacher_id,
-    'amount'       => $request->amount,
-    'payment_month'=> $request->payment_month,
-    'payment_date' => $request->payment_date,
-    'class_count'  => $request->class_count ?? 0,
-    'slug'         => Str::slug('tsal-' . uniqid()),
-]);
+            'teacher_id' => $request->teacher_id,
+            'amount' => $request->amount,
+            'payment_month' => $request->payment_month,
+            'payment_date' => $request->payment_date,
+            'class_count' => $request->class_count ?? 0,
+            'breakdown' => $request->breakdown,
+            'slug' => Str::slug('tsal-' . uniqid()),
+        ]);
 
         return redirect()->route('admin.teacher-salary.index')->with('success', 'Salary recorded.');
     }
@@ -57,15 +61,15 @@ class TeacherSalaryController extends Controller
 
     public function verifyMpin(Request $request)
     {
-        if ($request->mpin === env('ADMIN_SALARY_MPIN')) {
+        if ($request->mpin === config('app.admin_salary_mpin')) {
             session(['mpin_unlocked' => true]);
             return response()->json(['success' => true]);
         }
         return response()->json(['success' => false, 'message' => 'Invalid MPIN']);
     }
     public function show(TeacherSalary $teacherSalary)
-{
-    $teacherSalary->load('teacher');
-    return view('admin.teacher-salary.show', compact('teacherSalary'));
-}
+    {
+        $teacherSalary->load('teacher');
+        return view('admin.teacher-salary.show', compact('teacherSalary'));
+    }
 }

@@ -38,11 +38,11 @@
                     <form method="POST" action="{{ route('student.login.post') }}">
                         @csrf
                         <div class="mb-3">
-                            <label class="form-label fw-medium">Student ID or Email</label>
+                            <label class="form-label fw-medium">Student Email Id</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-person"></i></span>
                                 <input type="text" name="login" class="form-control @error('login') is-invalid @enderror"
-                                    placeholder="SA250001 or email" value="{{ old('login') }}" required autofocus>
+                                    placeholder="student@example.com" value="{{ old('login') }}" required autofocus>
                             </div>
                             @error('login')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                         </div>

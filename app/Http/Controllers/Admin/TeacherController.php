@@ -25,11 +25,11 @@ class TeacherController extends Controller
         }
         session()->forget('mpin_unlocked');
         $subjects = Subject::where('is_active', 1)->get();
-     $classes = Classes::where('is_active', 1)
-    ->with('board:id,name')           // load board
-    ->orderBy('board_id')
-    ->orderBy('name')
-    ->get();
+        $classes = Classes::where('is_active', 1)
+            ->with('board:id,name') // load board
+            ->orderBy('board_id')
+            ->orderBy('name')
+            ->get();
         return view('admin.teachers.create', compact('subjects', 'classes'));
     }
 
@@ -52,9 +52,9 @@ class TeacherController extends Controller
             'is_active' => $request->is_active ?? 1,
             'slug' => Str::slug($request->name . '-' . uniqid()),
         ]);
-        
 
-        foreach ((array) $request->subjects as $subjectId) {
+
+        foreach ((array)$request->subjects as $subjectId) {
             TeacherSubject::create([
                 'teacher_id' => $teacher->id,
                 'subject_id' => $subjectId,
@@ -79,19 +79,16 @@ class TeacherController extends Controller
     {
         $subjects = Subject::where('is_active', 1)->get();
         $assignedSubjects = $teacher->subjects->pluck('id')->toArray();
-       $classes = Classes::where('is_active', 1)
-    ->with('board:id,name')           // load board
-    ->orderBy('board_id')
-    ->orderBy('name')
-    ->get();
+        $classes = Classes::where('is_active', 1)
+            ->with('board:id,name') // load board
+            ->orderBy('board_id')
+            ->orderBy('name')
+            ->get();
         $classSalaries = $teacher->classes->pluck('pivot.amount', 'id')->toArray();
         return view('admin.teachers.edit', compact('teacher', 'subjects', 'assignedSubjects', 'classes', 'classSalaries'));
-    }
-public function show(Teacher $teacher)
-{
-    $teacher->load(['subjects', 'classes.board']);
-    return view('admin.teachers.show', compact('teacher'));
-}
+    }    public function show(Teacher $teacher)    {
+        $teacher->load(['subjects', 'classes.board']);
+        return view('admin.teachers.show', compact('teacher'));    }
     public function update(Request $request, Teacher $teacher)
     {
         $request->validate([
@@ -108,7 +105,7 @@ public function show(Teacher $teacher)
 
         // Re-sync subjects
         TeacherSubject::where('teacher_id', $teacher->id)->delete();
-        foreach ((array) $request->subjects as $subjectId) {
+        foreach ((array)$request->subjects as $subjectId) {
             TeacherSubject::create([
                 'teacher_id' => $teacher->id,
                 'subject_id' => $subjectId,
@@ -133,5 +130,14 @@ public function show(Teacher $teacher)
     {
         $teacher->delete();
         return redirect()->route('admin.teachers.index')->with('success', 'Teacher removed.');
+    }
+
+    public function verifyMpin(Request $request)
+    {
+        if ($request->mpin === config('app.admin_salary_mpin')) {
+            session(['mpin_unlocked' => true]);
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'Invalid MPIN']);
     }
 }

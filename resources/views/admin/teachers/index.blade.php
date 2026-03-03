@@ -30,7 +30,7 @@
                         <td>{{ $t->name }}</td>
                         <td>{{ $t->mobile }}</td>
                         <td>{{ $t->subjects->pluck('name')->join(', ') ?: '-' }}</td>
-                        <td>{{ $t->joining_date }}</td>
+                       <td>{{ \Carbon\Carbon::parse($t->joining_date)->format('d M Y') }}</td>
                         <td>
                             <span
                                 class="badge {{ $t->is_active ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">

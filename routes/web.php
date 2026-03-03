@@ -12,7 +12,8 @@ Route::get('/mail-test', function () {
             $m->to('alamkhank2015@gmail.com')->subject('SMTP Test');
         }
         );
-        return 'sent';    });
+        return 'sent';
+    });
 
 // ─── ADMIN ROUTES ────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -34,79 +35,93 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
             // Dashboard
             Route::get('dashboard', [Admin\DashboardController::class , 'index'])->name('dashboard');
+            Route::get('mpin/status/{key}', [Admin\MpinController::class , 'status'])->name('mpin.status');
+            Route::post('mpin/verify-ajax', [Admin\MpinController::class , 'verifyAjax'])->name('mpin.verify-ajax');
 
             // Profile
             Route::get('profile', [Admin\ProfileController::class , 'edit'])->name('profile.edit');
             Route::put('profile', [Admin\ProfileController::class , 'update'])->name('profile.update');
 
-            // Admin Accounts
-            Route::resource('admins', Admin\AdminController::class)->except(['show']);
+            // MPIN Management
+            Route::prefix('manage-mpin')->name('manage-mpin')->group(function () {
+                    Route::get('/', [Admin\MpinManagementController::class , 'index']);
+                    Route::post('/send-otp', [Admin\MpinManagementController::class , 'sendOtp'])->name('.send-otp');
+                    Route::get('/verify-otp', [Admin\MpinManagementController::class , 'showVerifyOtp'])->name('.verify-otp.form');
+                    Route::post('/verify-otp', [Admin\MpinManagementController::class , 'verifyOtp'])->name('.verify-otp');
+                    Route::get('/view-edit', [Admin\MpinManagementController::class , 'viewEdit'])->name('.view-edit');
+                    Route::post('/update', [Admin\MpinManagementController::class , 'update'])->name('.update');
+                }
+                );
 
-            // Boards
-            Route::resource('boards', Admin\BoardController::class)->except(['show']);
+                // Admin Accounts
+                Route::resource('admins', Admin\AdminController::class)->except(['show']);
 
-            // Classes
-            Route::resource('classes', Admin\ClassController::class)->except(['show']);
+                // Boards
+                Route::resource('boards', Admin\BoardController::class)->except(['show']);
 
-            // Subjects
-            Route::resource('subjects', Admin\SubjectController::class)->except(['show']);
+                // Classes
+                Route::resource('classes', Admin\ClassController::class)->except(['show']);
 
-            // Students
-            Route::resource('students', Admin\StudentController::class);
-            Route::get('students/{student}/fee-history', [Admin\StudentController::class , 'feeHistory'])->name('students.fee-history');
+                // Subjects
+                Route::resource('subjects', Admin\SubjectController::class)->except(['show']);
 
-            // Teachers
-            Route::resource('teachers', Admin\TeacherController::class)->except(['show']);
-            Route::get('teachers/verify-mpin', [Admin\TeacherController::class , 'verifyMpin'])->name('teachers.verify-mpin');
-            Route::get('teachers/{teacher}', [Admin\TeacherController::class , 'show'])->name('teachers.show');
+                // Students
+                Route::resource('students', Admin\StudentController::class);
+                Route::get('students/{student}/fee-history', [Admin\StudentController::class , 'feeHistory'])->name('students.fee-history');
 
-            // Teacher Salary
-            Route::resource('teacher-salary', Admin\TeacherSalaryController::class)->only(['index', 'create', 'store', 'destroy', 'show']);
-            Route::post('teacher-salary/verify-mpin', [Admin\TeacherSalaryController::class , 'verifyMpin'])->name('teacher-salary.verify-mpin');
+                // Teachers
+                Route::resource('teachers', Admin\TeacherController::class)->except(['show']);
+                Route::get('teachers/verify-mpin', [Admin\TeacherController::class , 'verifyMpin'])->name('teachers.verify-mpin');
+                Route::get('teachers/{teacher}', [Admin\TeacherController::class , 'show'])->name('teachers.show');
 
-            // Staff
-            Route::resource('staff', Admin\StaffController::class)->except(['show']);
+                // Teacher Salary
+                Route::resource('teacher-salary', Admin\TeacherSalaryController::class)->only(['index', 'create', 'store', 'destroy', 'show']);
+                Route::post('teacher-salary/verify-mpin', [Admin\TeacherSalaryController::class , 'verifyMpin'])->name('teacher-salary.verify-mpin');
 
-            // Staff Salary
-            Route::resource('staff-salary', Admin\StaffSalaryController::class)->only(['index', 'create', 'store', 'destroy']);
-            Route::post('staff-salary/verify-mpin', [Admin\StaffSalaryController::class , 'verifyMpin'])->name('staff-salary.verify-mpin');
+                // Staff
+                Route::resource('staff', Admin\StaffController::class)->except(['show']);
 
-            // Expenditures
-            Route::resource('expenditures', Admin\ExpenditureController::class)->except(['show']);
+                // Staff Salary 
+                Route::resource('staff-salary', Admin\StaffSalaryController::class)->only(['index', 'create', 'store', 'destroy']);
+                Route::post('staff-salary/verify-mpin', [Admin\StaffSalaryController::class , 'verifyMpin'])->name('staff-salary.verify-mpin');
 
-            // Attendance
-            Route::get('attendance', [Admin\AttendanceController::class , 'index'])->name('attendance.index');
-            Route::get('attendance/create', [Admin\AttendanceController::class , 'create'])->name('attendance.create');
-            Route::post('attendance', [Admin\AttendanceController::class , 'store'])->name('attendance.store');
-            Route::get('attendance/{id}', [Admin\AttendanceController::class , 'show'])->name('attendance.show');
-            Route::post('attendance/get-students', [Admin\AttendanceController::class , 'getStudents'])->name('attendance.get-students');
+                // Expenditures
+                Route::resource('expenditures', Admin\ExpenditureController::class)->except(['show']);
 
-            // Exams & Marks
-            Route::resource('exams', Admin\ExamController::class)->except(['show']);
-            Route::get('exams/{exam}/marks', [Admin\ExamController::class , 'marks'])->name('exams.marks');
-            Route::post('exams/{exam}/marks', [Admin\ExamController::class , 'storeMarks'])->name('exams.marks.store');
-            Route::get('exams/export-pdf', [Admin\ExamController::class , 'exportPdf'])->name('exams.export-pdf');
-            Route::get('exams/{exam}/view-marks', [Admin\ExamController::class , 'viewMarks'])->name('exams.view-marks');
-            Route::get('exams/{exam}/marks-export-pdf', [Admin\ExamController::class , 'exportMarksPdf'])->name('exams.marks.export-pdf');
-            Route::get('exams/export-csv', [Admin\ExamController::class , 'exportCsv'])->name('exams.export-csv');
-            Route::get('exams/{exam}/marks-export-csv', [Admin\ExamController::class , 'exportMarksCsv'])->name('exams.marks.export-csv');
+                // Attendance
+                Route::get('attendance', [Admin\AttendanceController::class , 'index'])->name('attendance.index');
+                Route::get('attendance/create', [Admin\AttendanceController::class , 'create'])->name('attendance.create');
+                Route::post('attendance', [Admin\AttendanceController::class , 'store'])->name('attendance.store');
+                Route::get('attendance/{id}', [Admin\AttendanceController::class , 'show'])->name('attendance.show');
+                Route::post('attendance/get-students', [Admin\AttendanceController::class , 'getStudents'])->name('attendance.get-students');
 
-            // Fees
-            Route::get('fees', [Admin\FeeController::class , 'index'])->name('fees.index');
-            Route::get('fees/create', [Admin\FeeController::class , 'create'])->name('fees.create');
-            Route::post('fees', [Admin\FeeController::class , 'store'])->name('fees.store');
-            Route::post('fees/verify-mpin', [Admin\FeeController::class , 'verifyMpin'])->name('fees.verify-mpin');
-            Route::get('fees/students-by-class', [Admin\AjaxFeeController::class , 'getStudentsByClass'])->name('fees.students-by-class');
+                // Exams & Marks 
+                Route::resource('exams', Admin\ExamController::class)->except(['show']);
+                Route::get('exams/{exam}/marks', [Admin\ExamController::class , 'marks'])->name('exams.marks');
+                Route::post('exams/{exam}/marks', [Admin\ExamController::class , 'storeMarks'])->name('exams.marks.store');
+                Route::get('exams/export-pdf', [Admin\ExamController::class , 'exportPdf'])->name('exams.export-pdf');
+                Route::get('exams/{exam}/view-marks', [Admin\ExamController::class , 'viewMarks'])->name('exams.view-marks');
+                Route::get('exams/{exam}/marks-export-pdf', [Admin\ExamController::class , 'exportMarksPdf'])->name('exams.marks.export-pdf');
+                Route::get('exams/export-csv', [Admin\ExamController::class , 'exportCsv'])->name('exams.export-csv');
+                Route::get('exams/{exam}/marks-export-csv', [Admin\ExamController::class , 'exportMarksCsv'])->name('exams.marks.export-csv');
 
-            // Study Material
-            Route::resource('study-materials', Admin\StudyMaterialController::class)->except(['show']);
-            Route::get('study-materials/{material}/assign', [Admin\StudyMaterialController::class , 'assign'])->name('study-materials.assign');
-            Route::post('study-materials/{material}/assign', [Admin\StudyMaterialController::class , 'doAssign'])->name('study-materials.do-assign');
-            Route::get('study-materials/{material}/assignments', [Admin\StudyMaterialController::class , 'viewAssignments'])->name('study-materials.assignments');
-            Route::put('study-materials/assignment/{assignment}/update-status', [Admin\StudyMaterialController::class , 'updateStatus'])->name('study-materials.update-status');
+                // Fees
+                Route::get('fees', [Admin\FeeController::class , 'index'])->name('fees.index');
+                Route::get('fees/create', [Admin\FeeController::class , 'create'])->name('fees.create');
+                Route::get('fees/pending', [Admin\FeeController::class , 'pending'])->name('fees.pending');
+                Route::post('fees', [Admin\FeeController::class , 'store'])->name('fees.store');
+                Route::post('fees/verify-mpin', [Admin\FeeController::class , 'verifyMpin'])->name('fees.verify-mpin');
+                Route::get('fees/students-by-class', [Admin\AjaxFeeController::class , 'getStudentsByClass'])->name('fees.students-by-class');
+                Route::get('fees/pending', [Admin\FeeController::class , 'pending'])->name('fees.pending');
+                // Study Material
+                Route::resource('study-materials', Admin\StudyMaterialController::class)->except(['show']);
+                Route::get('study-materials/{material}/assign', [Admin\StudyMaterialController::class , 'assign'])->name('study-materials.assign');
+                Route::post('study-materials/{material}/assign', [Admin\StudyMaterialController::class , 'doAssign'])->name('study-materials.do-assign');
+                Route::get('study-materials/{material}/assignments', [Admin\StudyMaterialController::class , 'viewAssignments'])->name('study-materials.assignments');
+                Route::put('study-materials/assignment/{assignment}/update-status', [Admin\StudyMaterialController::class , 'updateStatus'])->name('study-materials.update-status');
 
-            // Reports
-            Route::prefix('reports')->name('reports.')->group(function () {
+                // Reports
+                Route::prefix('reports')->name('reports.')->group(function () {
                     Route::get('attendance', [Admin\ReportController::class , 'attendance'])->name('attendance');
                     Route::post('get-students-by-class', [Admin\ReportController::class , 'getStudentsByClass'])->name('get-students-by-class');
                     Route::get('export-attendance-csv', [Admin\ReportController::class , 'exportAttendanceCsv'])->name('export-attendance-csv');
@@ -116,11 +131,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
                     Route::get('financial', [Admin\ReportController::class , 'financial'])->name('financial');
                     Route::get('export-pdf', [Admin\ReportController::class , 'exportPdf'])->name('export-pdf');
                     Route::get('export-csv', [Admin\ReportController::class , 'exportCsv'])->name('export-csv');
+                    Route::get('exam/export-pdf', [Admin\ReportController::class , 'exportExamPdf'])->name('exam-pdf');
+                    Route::get('exam/export-csv', [Admin\ReportController::class , 'exportExamCsv'])->name('exam-csv');
                 }
                 );
             }
             );        });
-
 // ─── STUDENT ROUTES ───────────────────────────────────────────────────────────
 Route::prefix('student')->name('student.')->group(function () {
 

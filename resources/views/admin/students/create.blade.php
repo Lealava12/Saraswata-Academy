@@ -69,15 +69,15 @@
                 </div>
                 <div class="col-md-8">
                     <label class="form-label fw-medium">School Name</label>
-                    <input type="text" name="school_name" class="form-control" value="{{ old('school_name') }}" placeholder="Student's school (optional)">
+                    <input type="text" name="school_name" class="form-control" value="{{ old('school_name') }}" placeholder="Student's school (optional)" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Photo</label>
-                    <input type="file" name="photo" class="form-control" accept="image/*">
+                    <input type="file" name="photo" class="form-control" accept="image/*" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Progress Report</label>
-                    <input type="file" name="progress_report" class="form-control" accept=".pdf,image/*">
+                    <input type="file" name="progress_report" class="form-control" accept=".pdf,image/*" >
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Status</label>
@@ -90,22 +90,22 @@
                 <div class="col-12"><hr class="my-1"><h6 class="text-muted fw-semibold">Parent / Guardian Details</h6></div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Father's Name</label>
-                    <input type="text" name="father_name" class="form-control" value="{{ old('father_name') }}">
+                    <input type="text" name="father_name" class="form-control" value="{{ old('father_name') }}" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Father's Mobile</label>
-              <input type="number" id="father_mobile" name="father_mobile" class="form-control" value="{{ old('father_mobile') }}">
+              <input type="number" id="father_mobile" name="father_mobile" class="form-control" value="{{ old('father_mobile') }}" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Mother's Name</label>
-                    <input type="text" name="mother_name" class="form-control" value="{{ old('mother_name') }}">
+                    <input type="text" name="mother_name" class="form-control" value="{{ old('mother_name') }}" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Mother's Mobile</label>
                  <input type="number" id="mother_mobile" name="mother_mobile" class="form-control" value="{{ old('mother_mobile') }}">                </div>
                 <div class="col-md-8">
                     <label class="form-label fw-medium">Address</label>
-                    <textarea name="address" class="form-control" rows="2">{{ old('address') }}</textarea>
+                    <textarea name="address" class="form-control" rows="2" required>{{ old('address') }}</textarea>
                 </div>
 
                     <div class="col-12 mt-2">

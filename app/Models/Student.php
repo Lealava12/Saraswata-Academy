@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Carbon\Carbon;
 
 class Student extends Authenticatable
 {
@@ -43,7 +44,7 @@ class Student extends Authenticatable
     }
     public function board()
     {
-        return $this->belongsTo(Board::class);
+        return $this->belongsTo(Board::class,'board_id');
     }
     public function parent()
     {
@@ -76,7 +77,72 @@ class Student extends Authenticatable
     {
         return $q->where('is_active', 1);
     }
+public function getTotalPaidFees(): float
+{
+    return (float) $this->fees()->sum('amount');
+}
 
+/**
+ * Expected fees till today:
+ * First due = joining_date + 1 month (no overflow)
+ */
+public function getExpectedFeesTillToday(): float
+{
+    $fee = (float)($this->monthly_fees ?? 0);
+    if ($fee <= 0 || !$this->joining_date) return 0;
+
+    $today = now()->startOfDay();
+    $join  = Carbon::parse($this->joining_date)->startOfDay();
+
+    $due = $join->copy()->addMonthNoOverflow();
+
+    $count = 0;
+    while ($due->lte($today)) {
+        $count++;
+        $due->addMonthNoOverflow();
+        if ($count > 240) break; // safety
+    }
+
+    return $count * $fee;
+}
+
+public function getBalanceDue(): float
+{
+    $expected = $this->getExpectedFeesTillToday();
+    $paid = $this->getTotalPaidFees();
+    return max(0, $expected - $paid);
+}
+
+/**
+ * Overdue means pending balance exists AND last due date +10 days passed
+ */
+public function getOverdueStatus(): bool
+{
+    if (!$this->joining_date) return false;
+
+    $fee = (float)($this->monthly_fees ?? 0);
+    if ($fee <= 0) return false;
+
+    $balance = $this->getBalanceDue();
+    if ($balance <= 0) return false;
+
+    $today = now()->startOfDay();
+    $join  = Carbon::parse($this->joining_date)->startOfDay();
+
+    // find latest due date that is <= today (due starts after 1 month)
+    $due = $join->copy()->addMonthNoOverflow();
+    $lastDue = null;
+
+    while ($due->lte($today)) {
+        $lastDue = $due->copy();
+        $due->addMonthNoOverflow();
+        if ($due->diffInMonths($join) > 240) break;
+    }
+
+    if (!$lastDue) return false; // no due yet
+
+    return $today->gt($lastDue->copy()->addDays(10));
+}
     /**
      * Generate the next student_id for the given academic session year.
      * Format: SA + yearCode (e.g. "2526") + 4-digit seq

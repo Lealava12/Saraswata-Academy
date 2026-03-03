@@ -105,7 +105,32 @@
         </div>
     </div>
     <div class="col-lg-5">
-        <div class="card border-danger">
+        @if($latePaymentAlerts->count() > 0)
+        <div class="card border-danger mb-3 shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h6 class="mb-0"><i class="bi bi-megaphone-fill me-2"></i>Critical Late Payments</h6>
+            </div>
+            <div class="card-body py-2">
+                <div class="small text-muted mb-2">Following students have pending fees for over 10 days:</div>
+                <ul class="list-group list-group-flush">
+                    @foreach($latePaymentAlerts as $s)
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                        <div>
+                            <div class="fw-bold">{{ $s->name }}</div>
+                            <small class="text-muted">{{ $s->classInfo->name ?? '-' }} | ₹{{ number_format($s->getBalanceDue()) }}</small>
+                        </div>
+                        <a href="{{ route('admin.fees.create', ['student_id' => $s->id]) }}" class="btn btn-xs btn-outline-danger">Collect</a>
+                    </li>
+                    @endforeach
+                </ul>
+                <div class="text-center mt-2">
+                    <a href="{{ route('admin.fees.pending') }}" class="btn btn-link btn-sm text-danger p-0">View All Pending</a>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- <div class="card border-danger">
             <div class="card-header bg-danger text-white d-flex justify-content-between">
                 <span><i class="bi bi-exclamation-triangle-fill me-2"></i>Overdue Fees</span>
                 <a href="{{ route('admin.fees.index') }}" class="btn btn-sm btn-light">View All</a>
@@ -128,12 +153,12 @@
                             </tr>
                             @empty
                             <tr><td colspan="3" class="text-center text-muted py-4">No overdue fees 🎉</td></tr>
-                            @endforelse
+                            @endforelse 
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </div>
 @endsection

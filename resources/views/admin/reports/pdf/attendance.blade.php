@@ -99,7 +99,7 @@
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $attendance->attendance_date->format('d-m-Y') }}</td>
-                        <td>{{ $attendance->classInfo->name ?? '-' }}</td>
+                        <td>{{ ($attendance->classInfo->name ?? '-') . ($attendance->classInfo->board->name ? ' (' . $attendance->classInfo->board->name . ')' : '') }}</td>
                         <td>{{ $subjects }}</td>
                         <td>{{ $attendance->student_detail->student->student_id ?? '-' }}</td>
                         <td>{{ $attendance->student_detail->student->name ?? '-' }}</td>
@@ -114,7 +114,7 @@
                         <tr>
                             <td>{{ $loop->parent->iteration }}</td>
                             <td>{{ $attendance->attendance_date->format('d-m-Y') }}</td>
-                            <td>{{ $attendance->classInfo->name ?? '-' }}</td>
+                            <td>{{ ($attendance->classInfo->name ?? '-') . ($attendance->classInfo->board->name ? ' (' . $attendance->classInfo->board->name . ')' : '') }}</td>
                             <td>{{ $subjects }}</td>
                             <td>{{ $detail->student->student_id ?? '-' }}</td>
                             <td>{{ $detail->student->name ?? '-' }}</td>

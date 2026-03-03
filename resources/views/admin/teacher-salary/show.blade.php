@@ -46,6 +46,46 @@
                 <div>{{ $teacherSalary->created_at->format('d M Y h:i A') }}</div>
             </div>
 
+            <!-- Breakdown Table -->
+            @if($teacherSalary->breakdown && is_array($teacherSalary->breakdown))
+            <div class="col-12 mt-4">
+                <div class="card bg-light border-0">
+                    <div class="card-header fw-bold bg-secondary text-white">Calculation Breakdown</div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm mb-0">
+                                <thead class="table-dark text-center">
+                                    <tr>
+                                        <th>Class</th>
+                                        <th>Fee per Class (₹)</th>
+                                        <th>No. of Classes</th>
+                                        <th>Total (₹)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($teacherSalary->breakdown as $item)
+                                    <tr>
+                                        <td>{{ $item['class_name'] ?? '-' }}</td>
+                                        <td class="text-center">₹{{ number_format($item['fee'] ?? 0, 2) }}</td>
+                                        <td class="text-center">{{ $item['count'] ?? 0 }}</td>
+                                        <td class="text-end fw-semibold">₹{{ number_format($item['total'] ?? 0, 2) }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-secondary fw-bold">
+                                        <td colspan="2" class="text-end">Grand Total:</td>
+                                        <td class="text-center">{{ $teacherSalary->class_count ?? 0 }}</td>
+                                        <td class="text-end text-success">₹{{ number_format($teacherSalary->amount, 2) }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
         </div>
     </div>
 </div>

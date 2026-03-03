@@ -6,6 +6,9 @@
     <title>@yield('title', 'Student Portal') – Saraswata Academy</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+       <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+<link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+<link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #6366f1; }
@@ -27,8 +30,13 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm student-nav">
     <div class="container-fluid px-4">
         <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('student.dashboard') }}">
-            <i class="bi bi-mortarboard-fill brand-icon fs-4"></i>
-            <span class="fw-bold">Saraswata Academy</span>
+            
+             
+                <img src="{{ asset('logo.jpg') }}"
+                    alt="Saraswata Academy"
+                    style="max-height:60px;"
+                    class="img-fluid">
+            
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#studentNav">
             <span class="navbar-toggler-icon"></span>

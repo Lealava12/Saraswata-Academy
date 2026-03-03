@@ -86,7 +86,7 @@
             @foreach($exams as $i => $exam)
             <tr>
                 <td class="text-center">{{ $i+1 }}</td>
-                <td>{{ $exam->classInfo->name ?? '-' }}</td>
+                <td>{{ ($exam->classInfo->name ?? '-') . ($exam->classInfo->board->name ? ' (' . $exam->classInfo->board->name . ')' : '') }}</td>
                 <td>{{ $exam->subject->name ?? '-' }}</td>
                 <td>{{ \Carbon\Carbon::parse($exam->exam_date)->format('d-m-Y') }}</td>
                 <td class="text-center">{{ $exam->full_marks }}</td>

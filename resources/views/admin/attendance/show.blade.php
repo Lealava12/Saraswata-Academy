@@ -34,28 +34,65 @@
             @endforeach
         </div>
         
-        <table class="table table-hover">
-            <thead class="table-light">
-                <tr><th>#</th><th>Student ID</th><th>Name</th><th>Roll No</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-                @forelse($attendance->details as $i => $d)
-                <tr>
-                    <td>{{ $i+1 }}</td>
-                    <td><span class="badge bg-secondary">{{ $d->student->student_id ?? '-' }}</span></td>
-                    <td>{{ $d->student->name ?? '-' }}</td>
-                    <td>{{ $d->student->roll_no ?? '-' }}</td>
-                    <td>
-                        <span class="badge {{ $d->status === 'Present' ? 'bg-success' : 'bg-danger' }} rounded-pill px-3">
-                            {{ $d->status }}
-                        </span>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="5" class="text-center py-4 text-muted">No records.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+        @php
+            // Group details by student ID
+            $detailsByStudent = $attendance->details->groupBy('student_id');
+        @endphp
+
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered text-center align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th width="5%" rowspan="2" class="align-middle">#</th>
+                        <th width="15%" rowspan="2" class="align-middle">Student ID</th>
+                        <th width="20%" rowspan="2" class="align-middle">Name</th>
+                        <th width="10%" rowspan="2" class="align-middle">Roll No</th>
+                        <th colspan="{{ $attendance->subjects->count() }}">Subjects</th>
+                    </tr>
+                    <tr>
+                        @foreach($attendance->subjects as $subject)
+                            <th>{{ $subject->name }}</th>
+                        @endforeach
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($detailsByStudent as $studentId => $details)
+                    @php
+                        $student = $details->first()->student;
+                    @endphp
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td><span class="badge bg-secondary">{{ $student->student_id ?? '-' }}</span></td>
+                        <td>{{ $student->name ?? '-' }}</td>
+                        <td>{{ $student->roll_no ?? '-' }}</td>
+                        
+                        @foreach($attendance->subjects as $subject)
+                            @php
+                                // Find detail for this specific subject
+                                $subjectDetail = $details->firstWhere('subject_id', $subject->id);
+                                
+                                // Fallback for old records without subject_id
+                                if (!$subjectDetail && $details->whereNull('subject_id')->count() > 0) {
+                                    $subjectDetail = $details->whereNull('subject_id')->first();
+                                }
+                            @endphp
+                            <td>
+                                @if($subjectDetail)
+                                    <span class="badge {{ $subjectDetail->status === 'Present' ? 'bg-success' : 'bg-danger' }} rounded-pill px-3">
+                                        {{ $subjectDetail->status }}
+                                    </span>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                        @endforeach
+                    </tr>
+                    @empty
+                    <tr><td colspan="{{ 4 + $attendance->subjects->count() }}" class="text-center py-4 text-muted">No records.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 @endsection

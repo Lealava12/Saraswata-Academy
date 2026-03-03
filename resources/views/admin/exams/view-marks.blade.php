@@ -7,7 +7,7 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <span>
             <i class="bi bi-journal-text me-2"></i>
-            Marks List – {{ $exam->classInfo->name ?? '' }} / {{ $exam->subject->name ?? '' }} – {{ \Carbon\Carbon::parse($exam->exam_date)->format('d M Y') }}
+            Marks List – {{ $exam->classInfo->name ?? '' }} {{ optional($exam->classInfo->board)->name ? '('.$exam->classInfo->board->name.')' : '' }} / {{ $exam->subject->name ?? '' }} – {{ \Carbon\Carbon::parse($exam->exam_date)->format('d M Y') }}
             <span class="text-muted small">(Full Marks: {{ $exam->full_marks }})</span>
         </span>
         <div class="d-flex gap-2">

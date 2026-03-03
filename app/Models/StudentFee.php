@@ -18,7 +18,7 @@ class StudentFee extends Model
         'status',
         'receipt_no',
         'slug',
-        'is_active',
+         
     ];
 
     protected $casts = ['payment_date' => 'date', 'due_date' => 'date'];

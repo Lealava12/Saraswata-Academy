@@ -12,7 +12,7 @@
                 <select name="class_id" id="class_id" class="form-select form-select-sm">
                     <option value="">All Classes</option>
                     @foreach($classes as $c)
-                    <option value="{{ $c->id }}" {{ request('class_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                    <option value="{{ $c->id }}" {{ request('class_id') == $c->id ? 'selected' : '' }}>{{ $c->name }} {{ $c->board ? ' ('. $c->board->name .')' : '' }}</option>
                     @endforeach
                 </select>
             </div>
@@ -131,6 +131,7 @@
             </thead>
             <tbody>
                 @forelse($attendances ?? [] as $i => $attendance)
+                
                 @php
                     $present = $attendance->details->where('status', 'Present')->count();
                     $absent = $attendance->details->where('status', 'Absent')->count();
@@ -141,7 +142,7 @@
                 <tr>
                     <td>{{ $i+1 }}</td>
                     <td>{{ $attendance->attendance_date->format('d-m-Y') }}</td>
-                    <td>{{ $attendance->classInfo->name ?? '-' }}</td>
+                    <td>{{ $attendance->classInfo->name ?? '-' }} {{ optional($attendance->classInfo->board)->name ? '('.$attendance->classInfo->board->name.')' : '' }}</td>
                     <td>
                         @foreach($attendance->subjects as $subject)
                             <span class="badge bg-info">{{ $subject->name }}</span>
@@ -186,9 +187,10 @@
                     <th>Student ID</th>
                     <th>Student Name</th>
                     <th>Roll No</th>
+                    <th>Subject</th>
                     <th>Total Present</th>
                     <th>Total Absent</th>
-                    <th>Total Days</th>
+                    <th>Total Days/Classes</th>
                     <th>Attendance %</th>
                 </tr>
             </thead>
@@ -198,11 +200,17 @@
                     foreach($attendances as $attendance) {
                         foreach($attendance->details as $detail) {
                             $studentId = $detail->student_id;
-                            if(!isset($studentSummary[$studentId])) {
-                                $studentSummary[$studentId] = [
+                            // Use subject_id to distinguish records. If null, use a default fallback
+                            $subjectId = $detail->subject_id ?? 'all'; 
+                            
+                            $key = $studentId . '_' . $subjectId;
+                            
+                            if(!isset($studentSummary[$key])) {
+                                $studentSummary[$key] = [
                                     'name' => $detail->student->name ?? 'Unknown',
                                     'student_id' => $detail->student->student_id ?? '-',
                                     'roll_no' => $detail->student->roll_no ?? '-',
+                                    'subject_name' => $detail->subject->name ?? 'All Subjects (Legacy)',
                                     'present' => 0,
                                     'absent' => 0,
                                     'total' => 0
@@ -210,21 +218,22 @@
                             }
                             
                             if($detail->status === 'Present') {
-                                $studentSummary[$studentId]['present']++;
+                                $studentSummary[$key]['present']++;
                             } else {
-                                $studentSummary[$studentId]['absent']++;
+                                $studentSummary[$key]['absent']++;
                             }
-                            $studentSummary[$studentId]['total']++;
+                            $studentSummary[$key]['total']++;
                         }
                     }
                 @endphp
                 
                 @foreach($studentSummary as $index => $student)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $loop->iteration }}</td>
                     <td><span class="badge bg-secondary">{{ $student['student_id'] }}</span></td>
                     <td>{{ $student['name'] }}</td>
                     <td class="text-center">{{ $student['roll_no'] }}</td>
+                    <td>{{ $student['subject_name'] }}</td>
                     <td class="text-success fw-bold">{{ $student['present'] }}</td>
                     <td class="text-danger fw-bold">{{ $student['absent'] }}</td>
                     <td>{{ $student['total'] }}</td>

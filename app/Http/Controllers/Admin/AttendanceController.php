@@ -13,16 +13,17 @@ use Illuminate\Support\Facades\DB;
 
 class AttendanceController extends Controller
 {
-   public function index()
-{
-    $attendances = Attendance::with(['classInfo', 'subjects'])
-        ->latest()
-        ->get();
-    return view('admin.attendance.index', compact('attendances'));
-}
+    public function index()    {
+        $attendances = Attendance::with(['classInfo', 'subjects'])
+            ->latest()
+            ->get();
+        return view('admin.attendance.index', compact('attendances'));    }
     public function create()
-    {
-        $classes = Classes::where('is_active', 1)->get();
+    {        $classes = Classes::where('is_active', 1)
+            ->with('board:id,name')
+            ->orderBy('board_id')
+            ->orderBy('name')
+            ->get();
         $subjects = Subject::where('is_active', 1)->get();
         return view('admin.attendance.create', compact('classes', 'subjects'));
     }
@@ -36,54 +37,54 @@ class AttendanceController extends Controller
         return response()->json($students);
     }
 
-     public function store(Request $request)
-{
-    $request->validate([
-        'class_id' => 'required|exists:classes,id',
-        'subjects' => 'required|array|min:1',
-        'subjects.*' => 'exists:subjects,id',
-        'attendance_date' => 'required|date',
-        'attendance' => 'required|array',
-        'attendance.*' => 'in:Present,Absent'
-    ]);
-
-    try {
-        DB::beginTransaction();
-
-        // Create attendance record
-        $attendance = Attendance::create([
-            'class_id' => $request->class_id,
-            'attendance_date' => $request->attendance_date,
-            'slug' => Str::slug('att-' . uniqid()),
+    public function store(Request $request)    {
+        $request->validate([
+            'class_id' => 'required|exists:classes,id',
+            'subjects' => 'required|array|min:1',
+            'subjects.*' => 'exists:subjects,id',
+            'attendance_date' => 'required|date',
+            'attendance' => 'required|array',
+            'attendance.*.*' => 'in:Present,Absent'
         ]);
 
-        // Attach subjects using the relationship
-        $attendance->subjects()->attach($request->subjects);
+        try {
+            DB::beginTransaction();
 
-        // Create attendance details for each student
-        foreach ($request->attendance as $studentId => $status) {
-            AttendanceDetail::create([
-                'attendance_id' => $attendance->id,
-                'student_id' => $studentId,
-                'status' => $status,
-                'slug' => Str::slug('ad-' . uniqid()),
+            // Create attendance record
+            $attendance = Attendance::create([
+                'class_id' => $request->class_id,
+                'attendance_date' => $request->attendance_date,
+                'slug' => Str::slug('att-' . uniqid()),
             ]);
+
+            // Attach subjects using the relationship
+            $attendance->subjects()->attach($request->subjects);
+
+            // Create attendance details for each student and each subject
+            foreach ($request->attendance as $studentId => $subjects) {
+                foreach ($subjects as $subjectId => $status) {
+                    AttendanceDetail::create([
+                        'attendance_id' => $attendance->id,
+                        'student_id' => $studentId,
+                        'subject_id' => $subjectId,
+                        'status' => $status,
+                        'slug' => Str::slug('ad-' . uniqid()),
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('admin.attendance.index')->with('success', 'Attendance saved successfully.');
+
         }
+        catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Error saving attendance: ' . $e->getMessage());
+        }    }
 
-        DB::commit();
-        return redirect()->route('admin.attendance.index')->with('success', 'Attendance saved successfully.');
+    public function show($id)    {
+        $attendance = Attendance::with(['classInfo', 'subjects', 'details.student'])
+            ->findOrFail($id);
 
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->with('error', 'Error saving attendance: ' . $e->getMessage());
-    }
-}
-
-    public function show($id)
-{
-    $attendance = Attendance::with(['classInfo', 'subjects', 'details.student'])
-        ->findOrFail($id);
-    
-    return view('admin.attendance.show', compact('attendance'));
-}
+        return view('admin.attendance.show', compact('attendance'));    }
 }

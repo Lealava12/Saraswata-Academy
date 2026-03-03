@@ -13,18 +13,20 @@
     <div class="card-body">
         <form method="POST" action="{{ route('admin.attendance.store') }}" id="attendanceForm">
             @csrf
-            
+
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Class <span class="text-danger">*</span></label>
                     <select name="class_id" id="classSelect" class="form-select" required>
                         <option value="">-- Select Class --</option>
                         @foreach($classes as $class)
-                            <option value="{{ $class->id }}">{{ $class->name }}</option>
+                        <option value="{{ $class->id }}">
+                            {{ $class->name }} {{ $class->board ? '(' . $class->board->name . ')' : '' }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
-                
+
                 <div class="col-md-4">
                     <label class="form-label fw-medium">Date <span class="text-danger">*</span></label>
                     <input type="date" name="attendance_date" class="form-control" value="{{ date('Y-m-d') }}" required>
@@ -39,7 +41,7 @@
                             <select name="subjects[]" class="form-select subject-select" required>
                                 <option value="">-- Select Subject --</option>
                                 @foreach($subjects as $subject)
-                                    <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                                <option value="{{ $subject->id }}">{{ $subject->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -112,7 +114,7 @@ $(document).ready(function() {
     function checkDuplicateSubjects() {
         const subjectValues = [];
         let hasDuplicate = false;
-        
+
         $('select[name="subjects[]"]').each(function() {
             const value = $(this).val();
             if (value && value !== '') {
@@ -127,13 +129,13 @@ $(document).ready(function() {
                 $(this).removeClass('is-invalid');
             }
         });
-        
+
         if (hasDuplicate) {
             $('#subjectError').text('Duplicate subjects selected. Please choose different subjects.').show();
         } else {
             $('#subjectError').hide();
         }
-        
+
         return !hasDuplicate;
     }
 
@@ -144,7 +146,7 @@ $(document).ready(function() {
             return $(this).val() !== '';
         }).length > 0;
         const noDuplicates = checkDuplicateSubjects();
-        
+
         $('#loadStudentsBtn').prop('disabled', !(classSelected && subjectsSelected && noDuplicates));
     }
 
@@ -158,8 +160,9 @@ $(document).ready(function() {
 
     // Add more subject button
     $(document).on('click', '.add-more-subject', function() {
-        const subjectOptions = `@foreach($subjects as $subject)<option value="{{ $subject->id }}">{{ $subject->name }}</option>@endforeach`;
-        
+        const subjectOptions =
+            `@foreach($subjects as $subject)<option value="{{ $subject->id }}">{{ $subject->name }}</option>@endforeach`;
+
         const newRow = `
             <div class="row g-2 mb-2 subject-row">
                 <div class="col-md-6">
@@ -204,8 +207,9 @@ $(document).ready(function() {
         }
 
         // Show loading state
-        $('#studentsList').html('<tr><td colspan="5" class="text-center">Loading students...</td></tr>');
-        
+        $('#studentsList').html(
+        '<tr><td colspan="5" class="text-center">Loading students...</td></tr>');
+
         $.ajax({
             url: '{{ route("admin.attendance.get-students") }}',
             type: 'POST',
@@ -215,8 +219,20 @@ $(document).ready(function() {
             },
             success: function(students) {
                 if (students.length === 0) {
-                    $('#studentsList').html('<tr><td colspan="5" class="text-center text-warning">No students found in this class.</td></tr>');
+                    $('#studentsList').html(
+                        '<tr><td colspan="5" class="text-center text-warning">No students found in this class.</td></tr>'
+                        );
                 } else {
+                    // Get all selected subjects
+                    const selectedSubjects = [];
+                    $('select[name="subjects[]"]').each(function() {
+                        const val = $(this).val();
+                        const text = $(this).find('option:selected').text();
+                        if (val) {
+                            selectedSubjects.push({ id: val, name: text });
+                        }
+                    });
+
                     let rows = '';
                     students.forEach((student, index) => {
                         rows += `
@@ -225,24 +241,38 @@ $(document).ready(function() {
                                 <td><span class="badge bg-secondary">${student.student_id}</span></td>
                                 <td>${student.name}</td>
                                 <td class="text-center">${student.roll_no || '-'}</td>
-                                <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <input type="radio" class="btn-check attendance-radio" 
-                                            name="attendance[${student.id}]" value="Present" 
-                                            id="present_${student.id}" checked>
-                                        <label class="btn btn-outline-success btn-sm" 
-                                            for="present_${student.id}">
-                                            <i class="bi bi-check-circle"></i> Present
-                                        </label>
-                                        
-                                        <input type="radio" class="btn-check attendance-radio" 
-                                            name="attendance[${student.id}]" value="Absent" 
-                                            id="absent_${student.id}">
-                                        <label class="btn btn-outline-danger btn-sm" 
-                                            for="absent_${student.id}">
-                                            <i class="bi bi-x-circle"></i> Absent
-                                        </label>
+                                <td>
+                        `;
+
+                        // Generate attendance inputs for each selected subject
+                        selectedSubjects.forEach(subject => {
+                            rows += `
+                                    <div class="mb-2 p-2 border rounded bg-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="fw-medium text-primary"><i class="bi bi-book me-1"></i>${subject.name}</span>
+                                            <div class="btn-group" role="group">
+                                                <input type="radio" class="btn-check attendance-radio" 
+                                                    name="attendance[${student.id}][${subject.id}]" value="Present" 
+                                                    id="present_${student.id}_${subject.id}" checked>
+                                                <label class="btn btn-outline-success btn-sm" 
+                                                    for="present_${student.id}_${subject.id}">
+                                                    <i class="bi bi-check-circle"></i> Present
+                                                </label>
+                                                
+                                                <input type="radio" class="btn-check attendance-radio" 
+                                                    name="attendance[${student.id}][${subject.id}]" value="Absent" 
+                                                    id="absent_${student.id}_${subject.id}">
+                                                <label class="btn btn-outline-danger btn-sm" 
+                                                    for="absent_${student.id}_${subject.id}">
+                                                    <i class="bi bi-x-circle"></i> Absent
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
+                            `;
+                        });
+
+                        rows += `
                                 </td>
                             </tr>
                         `;
@@ -252,7 +282,9 @@ $(document).ready(function() {
                 $('#studentsContainer').removeClass('d-none');
             },
             error: function() {
-                $('#studentsList').html('<tr><td colspan="5" class="text-center text-danger">Error loading students. Please try again.</td></tr>');
+                $('#studentsList').html(
+                    '<tr><td colspan="5" class="text-center text-danger">Error loading students. Please try again.</td></tr>'
+                    );
             }
         });
     });
@@ -272,19 +304,19 @@ $(document).ready(function() {
         const subjectsSelected = $('select[name="subjects[]"]').filter(function() {
             return $(this).val() !== '';
         }).length;
-        
+
         if (subjectsSelected === 0) {
             e.preventDefault();
             alert('Please select at least one subject.');
             return false;
         }
-        
+
         if (!checkDuplicateSubjects()) {
             e.preventDefault();
             alert('Please fix duplicate subjects before saving.');
             return false;
         }
-        
+
         if ($('.attendance-radio').length === 0) {
             e.preventDefault();
             alert('Please load students first.');

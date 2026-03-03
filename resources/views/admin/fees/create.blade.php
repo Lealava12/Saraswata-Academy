@@ -16,7 +16,7 @@
             @csrf
 
             <div class="row g-3">
-
+   
                 {{-- Board --}}
                 <div class="col-md-3">
                     <label class="form-label fw-medium">Board <span class="text-danger">*</span></label>
@@ -261,9 +261,29 @@
     });
 
     // ✅ Initial filter + auto-select works when coming from ?student_id=xx
-    filterClassesByBoard(boardSelect.value);
-    filterStudents(boardSelect.value, classSelect.value);
-    updateFromStudent();
+filterClassesByBoard(boardSelect.value);
+
+// If board is selected but class is empty, try set class from selected student
+const selectedStudentOpt = studentSelect.options[studentSelect.selectedIndex];
+if (selectedStudentOpt && selectedStudentOpt.value) {
+    const studentClass = selectedStudentOpt.getAttribute('data-class');
+
+    if (!classSelect.value && studentClass) {
+        classSelect.value = studentClass;
+    }
+
+    // also ensure board matches selected student (safety)
+    const studentBoard = selectedStudentOpt.getAttribute('data-board');
+    if (!boardSelect.value && studentBoard) {
+        boardSelect.value = studentBoard;
+    }
+}
+
+// after setting class, filter again
+filterClassesByBoard(boardSelect.value);
+filterStudents(boardSelect.value, classSelect.value);
+
+updateFromStudent();
 })();
 </script>
 @endpush

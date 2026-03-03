@@ -34,7 +34,7 @@
                         <td class="text-muted">{{ \Illuminate\Support\Str::limit($m->description, 60) ?: '-' }}</td>
                         <td>
                             <span class="badge bg-secondary-subtle text-secondary">
-                                {{ $m->student_materials_count }} students
+                              {{ $m->issued_count }} students
                             </span>
                         </td>
                         <td>

@@ -16,7 +16,7 @@
                     <label class="form-label fw-medium">Class <span class="text-danger">*</span></label>
                     <select name="class_id" class="form-select" required>
                         @foreach($classes as $c)
-                        <option value="{{ $c->id }}" {{ $exam->class_id == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                        <option value="{{ $c->id }}" {{ $exam->class_id == $c->id ? 'selected' : '' }}>{{ $c->name }} {{ $c->board ? ' ('. $c->board->name .')' : '' }}</option>
                         @endforeach
                     </select>
                 </div>
